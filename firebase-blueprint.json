@@ -1,0 +1,85 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and tenant assignment",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "role": {
+          "type": "string",
+          "enum": ["SUPER_ADMIN", "ORG_ADMIN", "STAFF", "AGENT"]
+        },
+        "organizationId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "email", "name", "role", "organizationId"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Super admin registry document",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "role": {
+          "type": "string",
+          "enum": ["SUPER_ADMIN"]
+        },
+        "addedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["email", "role"]
+    },
+    "TestConnection": {
+      "title": "TestConnection",
+      "description": "Health check document",
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "string",
+          "maxLength": 10
+        }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Collection of user profiles"
+    },
+    "/admins/{userId}": {
+      "schema": "Admin",
+      "description": "Special admin access list"
+    },
+    "/test/{testId}": {
+      "schema": "TestConnection",
+      "description": "Connectivity test documents"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XCLOUD.NET — Hotspot Billing &amp; ISP Management</title>
+    <meta name="description" content="Production Hotspot Billing and ISP Management Platform for MikroTik, Omada, RADIUS, Vouchers, and Platform Subscriptions." />
+    <meta property="og:title" content="XCLOUD.NET — Hotspot Billing &amp; ISP Management" />
+    <meta property="og:description" content="Production Hotspot Billing and ISP Management Platform for MikroTik, Omada, RADIUS, Vouchers, and Platform Subscriptions." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      // Suppress Vite HMR WebSocket connection errors in sandbox iframe environment
+      window.addEventListener('error', function (e) {
+        if (e && (e.message?.includes('WebSocket') || e.message?.includes('@vite/client') || e.filename?.includes('@vite/client'))) {
+          e.stopImmediatePropagation();
+        }
+      });
+      window.addEventListener('unhandledrejection', function (e) {
+        var msg = e && e.reason ? (e.reason.message || String(e.reason)) : '';
+        if (msg.includes('WebSocket') || msg.includes('@vite/client') || msg.includes('createWebSocketModuleRunnerTransport')) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

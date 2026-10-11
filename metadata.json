@@ -1,0 +1,6 @@
+{
+  "name": "XCLOUD.NET — Hotspot Billing & ISP Management",
+  "description": "Production Hotspot Billing and ISP Management Platform for MikroTik, Omada, RADIUS, Vouchers, and Platform Subscriptions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
