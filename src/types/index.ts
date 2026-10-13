@@ -46,6 +46,7 @@ export interface User {
   passwordHash?: string;
   role: Role;
   organizationId: string;
+  organizationName?: string;
   phone?: string;
   createdAt: string;
   updatedAt: string;
@@ -137,11 +138,30 @@ export interface RouterNetworkConfig {
   defaultRateLimit?: string; // e.g. 5M/5M
 }
 
+export interface RouterRemoteAccess {
+  enabled: boolean;
+  method: 'MIKROTIK_CLOUD_DDNS' | 'WIREGUARD_TUNNEL' | 'SSTP_VPN' | 'PUBLIC_IP';
+  winboxPort: number; // default 8291
+  webfigPort: number; // default 80
+  sshPort: number; // default 22
+  cloudDdnsHost?: string; // e.g. 520008abcdef.sn.mynetname.net
+  tunnelIp?: string; // e.g. 10.99.1.15
+  remoteConnectHost?: string; // Address for WinBox connect
+  assignedRemotePort?: number; // Port for NAT relay proxy
+  allowedIpRanges?: string; // Whitelist CIDR, e.g. 0.0.0.0/0
+  lastStatusCheck?: string;
+  connectionStatus?: 'ONLINE' | 'STANDBY' | 'PENDING_CONFIG' | 'UNREACHABLE';
+}
+
 export interface Router {
   id: string;
   organizationId: string;
   name: string;
   type: RouterType;
+  model?: string;
+  cpuLoad?: number;
+  uptime?: string;
+  hasCriticalUpdate?: boolean;
   ipAddress?: string;
   dnsName?: string;
   apiPort?: number;
@@ -155,6 +175,7 @@ export interface Router {
   installationTokenExpiresAt?: string;
   installationTokenUsed?: boolean;
   networkConfig?: RouterNetworkConfig;
+  remoteAccess?: RouterRemoteAccess;
   manualScriptGeneratedAt?: string;
   manualScriptDownloadedAt?: string;
   createdAt: string;
@@ -342,4 +363,78 @@ export interface OmadaDevice {
   firmwareVersion?: string;
   clientCount?: number;
   lastSeen?: string;
+}
+
+export interface CaptivePortalConfig {
+  id: string;
+  organizationId: string;
+  ssidName: string;
+  portalTitle: string;
+  portalSubtitle: string;
+  themeColor: string;
+  logoUrl?: string;
+  supportPhone: string;
+  supportEmail: string;
+  termsOfService: string;
+  enableVoucherLogin: boolean;
+  enableMobileMoneyBuy: boolean;
+  enableFreeTrial: boolean;
+  freeTrialMinutes: number;
+  enableMemberLogin: boolean;
+  routerDns: string;
+  updatedAt: string;
+}
+
+export interface PaymentGatewayConfig {
+  id: string; // 'snippe' | 'agents' | 'clickpesa' | 'azampay' | 'flutterwave' | 'pesapal' | 'swychr'
+  name: string;
+  isActive: boolean;
+  priorityOrder: number;
+  actionType: 'CONFIGURE' | 'PREFERENCES';
+  badgeColor?: string;
+  credentials: {
+    apiKey?: string;
+    publicKey?: string;
+    secretKey?: string;
+    merchantId?: string;
+    appId?: string;
+    webhookUrl?: string;
+    environment?: 'sandbox' | 'production';
+    currency?: string;
+    minFloatTzs?: number;
+    commissionPercent?: number;
+    autoApproveLimitTzs?: number;
+    accountReference?: string;
+  };
+  supportedChannels: string[];
+  instructions?: {
+    overview: string;
+    steps: string[];
+    documentationUrl?: string;
+  };
+  lastTestedAt?: string;
+  lastTestStatus?: 'SUCCESS' | 'FAILED' | 'PENDING';
+}
+
+export interface SmsGatewayConfig {
+  provider: 'BEEM_AFRICA' | 'NEXTSMS' | 'TWILIO' | 'GENERIC_HTTP';
+  apiKey?: string;
+  secretKey?: string;
+  senderId?: string;
+  isActive: boolean;
+  balance?: number;
+  template: string;
+  testPhone?: string;
+}
+
+export interface GeneralSettingsConfig {
+  networkName: string;
+  hotspotTitle: string;
+  currency: string;
+  timezone: string;
+  supportPhone: string;
+  supportEmail: string;
+  sessionTimeoutMinutes: number;
+  idleTimeoutMinutes: number;
+  defaultRateLimit: string;
 }

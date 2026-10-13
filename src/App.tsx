@@ -37,9 +37,14 @@ import { OmadaView } from './components/OmadaView.tsx';
 import { SuperAdminView } from './components/SuperAdminView.tsx';
 import { GlobalMonitoringView } from './components/GlobalMonitoringView.tsx';
 import { AuditLogsView } from './components/AuditLogsView.tsx';
+import { CaptivePortalView } from './components/CaptivePortalView.tsx';
 import { LoginModal } from './components/LoginModal.tsx';
+import { PaymentGatewaysView } from './components/PaymentGatewaysView.tsx';
+import { SettingsGeneralView } from './components/SettingsGeneralView.tsx';
+import { SettingsSmsView } from './components/SettingsSmsView.tsx';
+import { SettingsAdvancedView } from './components/SettingsAdvancedView.tsx';
 
-import { Menu, Bell, RefreshCw, Shield, Lock, UserCheck, LogIn } from 'lucide-react';
+import { Menu, Bell, RefreshCw, Shield, Lock, UserCheck, LogIn, Calendar, ChevronDown, Moon } from 'lucide-react';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -92,29 +97,28 @@ export default function App() {
           setLoading(false);
           return;
         } catch (e) {
-          console.error('Firebase auto-auth session sync failed:', e);
+          console.error('Firebase session sync failed:', e);
         }
       }
 
-      // If no active Firebase session yet, check existing backend session or auto-auth Special Admin
-      try {
-        const res = await ApiClient.get('/api/v1/auth/me');
-        setCurrentUser(res.user);
-      } catch {
-        // Auto-auth with designated Super Admin mussamatembo3@gmail.com
+      // If no active Firebase session, check existing backend session via stored token
+      const token = ApiClient.getToken();
+      if (token) {
         try {
-          const loginRes = await ApiClient.post('/api/v1/auth/login', {
-            email: 'mussamatembo3@gmail.com',
-            password: 'Password123!',
-          });
-          ApiClient.setToken(loginRes.token);
-          setCurrentUser(loginRes.user);
-        } catch {
+          const res = await ApiClient.get('/api/v1/auth/me');
+          setCurrentUser(res.user);
+        } catch (e) {
+          console.warn('Existing session invalid or expired:', e);
+          ApiClient.setToken(null);
+          setCurrentUser(null);
           setShowLoginModal(true);
         }
-      } finally {
-        setLoading(false);
+      } else {
+        // No saved session - require normal login
+        setCurrentUser(null);
+        setShowLoginModal(true);
       }
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -219,6 +223,14 @@ export default function App() {
         return 'Super Admin — Global Router & Omada Activity Monitoring';
       case 'superadmin':
         return 'Super Admin Platform Control Console';
+      case 'settings-general':
+        return 'Settings — General Configuration';
+      case 'settings-sms':
+        return 'Settings — SMS Gateway Integration';
+      case 'payment-gateways':
+        return 'Settings — Payment Gateways';
+      case 'settings-advanced':
+        return 'Settings — Advanced Protocols & Secrets';
       default:
         return 'XCLOUD.NET';
     }
@@ -241,85 +253,162 @@ export default function App() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header Bar */}
-        <header className="h-16 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsSidebarOpen(true)}
-              className="md:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition cursor-pointer"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <h1 className="text-base sm:text-lg font-bold text-white truncate">
-              {getPageTitle()}
-            </h1>
-          </div>
+        {activeTab === 'dashboard' ? (
+          <header className="h-16 bg-[#090d16] border-b border-[#182233] sticky top-0 z-30 px-4 sm:px-8 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="md:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition cursor-pointer"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Dashboard</h1>
+            </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Current Role Badge */}
-            {currentUser && (
-              <div className="flex items-center gap-1.5">
-                {currentUser.role === 'SUPER_ADMIN' ? (
-                  <span
-                    title="Logged in as Super Admin: Global cross-tenant monitoring is visible and active"
-                    className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold rounded-lg bg-purple-950/80 text-purple-300 border border-purple-700/60 shadow-xs"
-                  >
-                    <Shield className="w-3.5 h-3.5 text-purple-400" />
-                    Special Admin (Global Access)
-                  </span>
-                ) : (
-                  <span
-                    title="Logged in as standard user: Global monitoring is restricted and hidden"
-                    className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold rounded-lg bg-slate-800 text-slate-300 border border-slate-700"
-                  >
-                    <Lock className="w-3.5 h-3.5 text-slate-400" />
-                    {currentUser.role === 'ORG_ADMIN' ? 'Org Admin' : 'Staff'} (Tenant Only)
-                  </span>
-                )}
+            <div className="flex items-center gap-3">
+              {/* Date Selector Pill */}
+              <div className="bg-[#121927] border border-[#1e2738] rounded-xl px-3.5 py-1.5 flex items-center gap-2 text-xs text-slate-300 font-medium shadow-xs">
+                <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                <span>Oct 1, 2026 - Oct 6, 2026</span>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+              </div>
 
-                {/* Switch Role / Account shortcut */}
+              {/* Theme Toggle Button */}
+              <button
+                title="Toggle theme"
+                className="p-2 bg-[#121927] hover:bg-slate-800 border border-[#1e2738] rounded-xl text-slate-400 hover:text-white transition cursor-pointer"
+              >
+                <Moon className="w-4 h-4" />
+              </button>
+
+              {/* User Profile Avatar */}
+              <div
+                onClick={() => setShowLoginModal(true)}
+                title={currentUser ? `${currentUser.name} (${currentUser.role})` : 'Sign In'}
+                className="w-8 h-8 rounded-full bg-[#10b981] text-slate-950 font-bold text-xs flex items-center justify-center shadow-md shadow-emerald-500/20 select-none cursor-pointer"
+              >
+                😊
+              </div>
+            </div>
+          </header>
+        ) : (
+          <header className="h-16 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="md:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition cursor-pointer"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              <h1 className="text-base sm:text-lg font-bold text-white truncate">
+                {getPageTitle()}
+              </h1>
+            </div>
+
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Current Role Badge or Sign In Button */}
+              {currentUser ? (
+                <div className="flex items-center gap-1.5">
+                  {currentUser.role === 'SUPER_ADMIN' ? (
+                    <span
+                      title="Logged in as Super Admin: Global cross-tenant monitoring is visible and active"
+                      className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold rounded-lg bg-purple-950/80 text-purple-300 border border-purple-700/60 shadow-xs"
+                    >
+                      <Shield className="w-3.5 h-3.5 text-purple-400" />
+                      Super Admin (Global Access)
+                    </span>
+                  ) : (
+                    <span
+                      title="Logged in as standard user: Global monitoring is restricted and hidden"
+                      className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold rounded-lg bg-slate-800 text-slate-300 border border-slate-700"
+                    >
+                      <Lock className="w-3.5 h-3.5 text-slate-400" />
+                      {currentUser.role === 'ORG_ADMIN' ? 'Org Admin' : 'Staff'} (Tenant Only)
+                    </span>
+                  )}
+
+                  {/* Switch Account shortcut */}
+                  <button
+                    onClick={() => setShowLoginModal(true)}
+                    title="Switch between Accounts or Log In"
+                    className="px-2.5 py-1 text-[11px] font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition cursor-pointer flex items-center gap-1"
+                  >
+                    <UserCheck className="w-3.5 h-3.5 text-indigo-400" />
+                    <span className="hidden md:inline">Switch Account</span>
+                  </button>
+                </div>
+              ) : (
                 <button
                   onClick={() => setShowLoginModal(true)}
-                  title="Switch between Special Admin and Standard Tenant Admin"
-                  className="px-2.5 py-1 text-[11px] font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition cursor-pointer flex items-center gap-1"
+                  className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-lg text-xs transition cursor-pointer flex items-center gap-1.5 shadow-sm"
                 >
-                  <UserCheck className="w-3.5 h-3.5 text-indigo-400" />
-                  <span className="hidden md:inline">Switch Role</span>
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span>Sign In</span>
                 </button>
-              </div>
-            )}
+              )}
 
-            <button
-              onClick={refreshData}
-              title="Refresh Data"
-              className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition cursor-pointer"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </button>
-
-            {subscription && (
-              <span
-                onClick={() => setActiveTab('subscription')}
-                className={`hidden lg:inline-flex px-2.5 py-1 text-[11px] font-bold rounded-full border cursor-pointer uppercase tracking-wider ${
-                  subscription.status === 'ACTIVE'
-                    ? 'bg-emerald-950 text-emerald-400 border-emerald-800'
-                    : subscription.status === 'GRACE_PERIOD'
-                    ? 'bg-amber-950 text-amber-400 border-amber-800 animate-pulse'
-                    : 'bg-rose-950 text-rose-400 border-rose-800'
-                }`}
+              <button
+                onClick={refreshData}
+                title="Refresh Data"
+                className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition cursor-pointer"
               >
-                Plan: {subscription.status}
-              </span>
-            )}
-          </div>
-        </header>
+                <RefreshCw className="w-4 h-4" />
+              </button>
+
+              {subscription && (
+                <span
+                  onClick={() => setActiveTab('subscription')}
+                  className={`hidden lg:inline-flex px-2.5 py-1 text-[11px] font-bold rounded-full border cursor-pointer uppercase tracking-wider ${
+                    subscription.status === 'ACTIVE'
+                      ? 'bg-emerald-950 text-emerald-400 border-emerald-800'
+                      : subscription.status === 'GRACE_PERIOD'
+                      ? 'bg-amber-950 text-amber-400 border-amber-800 animate-pulse'
+                      : 'bg-rose-950 text-rose-400 border-rose-800'
+                  }`}
+                >
+                  Plan: {subscription.status}
+                </span>
+              )}
+            </div>
+          </header>
+        )}
 
         {/* Dynamic Page Views */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+          {!currentUser && (
+            <div className="mb-6 p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-500/30">
+                  <Lock className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Sign In to Manage Hotspot Networks</h3>
+                  <p className="text-xs text-slate-400">
+                    Sign in with your email or Google account to manage MikroTik routers, generate vouchers, track payments, and monitor active sessions.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowLoginModal(true)}
+                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs transition cursor-pointer shrink-0 shadow-lg shadow-indigo-600/20 flex items-center gap-2"
+              >
+                <LogIn className="w-4 h-4" /> Sign In / Register
+              </button>
+            </div>
+          )}
+
           {activeTab === 'dashboard' && (
             <DashboardOverview
               summary={summary}
               recentTransactions={transactions}
+              routers={routers}
+              packages={packages}
+              vouchers={vouchers}
+              sessions={sessions}
+              currentUser={currentUser}
+              subscription={subscription}
               onNavigate={setActiveTab}
+              onRefresh={refreshData}
             />
           )}
 
@@ -335,6 +424,14 @@ export default function App() {
             <VouchersView
               vouchers={vouchers}
               packages={packages}
+              onRefresh={refreshData}
+            />
+          )}
+
+          {activeTab === 'captive-portal' && (
+            <CaptivePortalView
+              packages={packages}
+              routers={routers}
               onRefresh={refreshData}
             />
           )}
@@ -417,6 +514,20 @@ export default function App() {
               </div>
             )
           )}
+
+          {activeTab === 'payment-gateways' && <PaymentGatewaysView />}
+
+          {activeTab === 'settings-general' && (
+            <SettingsGeneralView
+              currentUser={currentUser}
+              subscription={subscription}
+              onRefresh={refreshData}
+            />
+          )}
+
+          {activeTab === 'settings-sms' && <SettingsSmsView />}
+
+          {activeTab === 'settings-advanced' && <SettingsAdvancedView />}
         </main>
       </div>
 

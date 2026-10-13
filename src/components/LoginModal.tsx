@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ApiClient } from '../lib/api.ts';
 import { User } from '../types/index.ts';
-import { Lock, Mail, Building, UserPlus, LogIn, AlertCircle, RefreshCw, ShieldCheck } from 'lucide-react';
+import { Lock, Mail, Building, UserPlus, LogIn, AlertCircle, RefreshCw, X } from 'lucide-react';
 import { auth, googleProvider, signInWithPopup, syncUserToFirestore } from '../lib/firebase.ts';
 
 interface LoginModalProps {
@@ -12,8 +12,8 @@ interface LoginModalProps {
 
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onSuccess, onClose }) => {
   const [isRegister, setIsRegister] = useState(false);
-  const [email, setEmail] = useState('mussamatembo3@gmail.com');
-  const [password, setPassword] = useState('Password123!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [orgName, setOrgName] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('+255710000111');
@@ -87,14 +87,18 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onSuccess, onClo
     }
   };
 
-  const handleQuickLogin = (demoEmail: string) => {
-    setEmail(demoEmail);
-    setPassword('Password123!');
-  };
-
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+      <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition cursor-pointer"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600/20 text-indigo-400 mb-3 border border-indigo-500/30">
             {isRegister ? <UserPlus className="w-6 h-6" /> : <Lock className="w-6 h-6" />}
@@ -149,13 +153,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onSuccess, onClo
             <span>
               {googleLoading
                 ? 'Authenticating with Google...'
-                : 'Sign In with Google (Auto Auth Admin)'}
+                : 'Sign In with Google'}
             </span>
           </button>
-          <div className="flex items-center gap-1.5 justify-center mt-2 text-[11px] text-emerald-400 font-medium">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            <span>mussamatembo3@gmail.com auto-authenticates as Special Admin</span>
-          </div>
         </div>
 
         <div className="relative flex py-2 items-center mb-4">
@@ -269,76 +269,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onSuccess, onClo
             )}
           </button>
         </form>
-
-        {/* Quick select presets */}
-        {!isRegister && (
-          <div className="mt-4 pt-4 border-t border-slate-800 text-center">
-            <span className="text-xs font-semibold text-slate-400 block mb-2">
-              Select Demo Role to Test Access:
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('mussamatembo3@gmail.com')}
-                className={`p-2 rounded-lg border text-left transition cursor-pointer ${
-                  email === 'mussamatembo3@gmail.com'
-                    ? 'bg-purple-950/60 border-purple-500 text-purple-200'
-                    : 'bg-slate-800/80 hover:bg-slate-700/80 border-slate-700 text-slate-300'
-                }`}
-              >
-                <div className="text-[11px] font-bold text-white flex items-center justify-between">
-                  <span>Special Admin</span>
-                  <span className="text-[9px] px-1 py-0.2 rounded bg-purple-900 text-purple-300 font-mono">
-                    GLOBAL
-                  </span>
-                </div>
-                <div className="text-[10px] text-purple-300/80 mt-0.5">
-                  Global Router &amp; Omada Activity
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('admin@mussatelecom.tz')}
-                className={`p-2 rounded-lg border text-left transition cursor-pointer ${
-                  email === 'admin@mussatelecom.tz'
-                    ? 'bg-indigo-950/60 border-indigo-500 text-indigo-200'
-                    : 'bg-slate-800/80 hover:bg-slate-700/80 border-slate-700 text-slate-300'
-                }`}
-              >
-                <div className="text-[11px] font-bold text-white flex items-center justify-between">
-                  <span>Org Admin</span>
-                  <span className="text-[9px] px-1 py-0.2 rounded bg-indigo-900 text-indigo-300 font-mono">
-                    LOCAL
-                  </span>
-                </div>
-                <div className="text-[10px] text-indigo-300/80 mt-0.5">
-                  Tenant only (No Global Activity)
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('support@xcloud.net')}
-                className={`p-2 rounded-lg border text-left transition cursor-pointer ${
-                  email === 'support@xcloud.net'
-                    ? 'bg-blue-950/60 border-blue-500 text-blue-200'
-                    : 'bg-slate-800/80 hover:bg-slate-700/80 border-slate-700 text-slate-300'
-                }`}
-              >
-                <div className="text-[11px] font-bold text-white flex items-center justify-between">
-                  <span>Staff</span>
-                  <span className="text-[9px] px-1 py-0.2 rounded bg-blue-900 text-blue-300 font-mono">
-                    LOCAL
-                  </span>
-                </div>
-                <div className="text-[10px] text-blue-300/80 mt-0.5">
-                  Operations (No Global Activity)
-                </div>
-              </button>
-            </div>
-          </div>
-        )}
 
         <div className="mt-4 text-center">
           <button

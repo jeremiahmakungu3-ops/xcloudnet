@@ -63,6 +63,18 @@ export class MikrotikService {
       status: 'UNCONFIGURED',
       location: params.location || 'HQ',
       networkConfig: defaultNetworkConfig,
+      remoteAccess: {
+        enabled: true,
+        method: 'MIKROTIK_CLOUD_DDNS',
+        winboxPort: 8291,
+        webfigPort: 80,
+        sshPort: 22,
+        assignedRemotePort: 18000 + (Math.floor(Math.random() * 8000)),
+        cloudDdnsHost: `${params.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.sn.mynetname.net`,
+        remoteConnectHost: `${params.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.sn.mynetname.net`,
+        allowedIpRanges: '0.0.0.0/0',
+        connectionStatus: 'PENDING_CONFIG',
+      },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -423,10 +435,140 @@ add name="xcloud-heartbeat-sched" start-time=startup interval=2m on-event="xclou
 # Run initial test heartbeat immediately
 /system script run xcloud-heartbeat
 
+# =====================================================================
+# SECTION E: WINBOX & REMOTE MANAGEMENT ACCESS
+# =====================================================================
+:log info "XCLOUD: [Step 6/7] Enabling WinBox (Port 8291), WebFig, and MikroTik Cloud DDNS..."
+
+# 1. Enable RouterOS Management Services
+/ip service
+:do { set winbox port=8291 disabled=no } on-error={ :log warning "XCLOUD: WinBox service update warning" }
+:do { set www port=80 disabled=no } on-error={}
+:do { set www-ssl port=443 disabled=no } on-error={}
+:do { set ssh port=22 disabled=no } on-error={}
+
+# 2. Enable MikroTik IP Cloud DDNS & Back-To-Home (BTH) VPN
+/ip cloud
+set ddns-enabled=yes update-time=yes
+:do {
+    set back-to-home-vpn=yes
+} on-error={
+    :do { /ip cloud back-to-home set enabled=yes } on-error={}
+}
+:do { /ip cloud force-update } on-error={}
+
+# 3. Allow WinBox (8291) & WebFig (80/443) through Firewall Input Chain
+:if ([:len [/ip firewall filter find comment="XCLOUD-ALLOW-WINBOX"]] = 0) do={
+    /ip firewall filter add chain=input protocol=tcp dst-port=8291 action=accept place-before=0 comment="XCLOUD-ALLOW-WINBOX"
+}
+:if ([:len [/ip firewall filter find comment="XCLOUD-ALLOW-WEBFIG"]] = 0) do={
+    /ip firewall filter add chain=input protocol=tcp dst-port=80,443 action=accept place-before=1 comment="XCLOUD-ALLOW-WEBFIG"
+}
+:if ([:len [/ip firewall filter find comment="XCLOUD-ALLOW-SSH"]] = 0) do={
+    /ip firewall filter add chain=input protocol=tcp dst-port=22 action=accept place-before=2 comment="XCLOUD-ALLOW-SSH"
+}
+
 :log info "XCLOUD: =========================================================="
-:log info "XCLOUD: RouterOS v7 Provisioning completed successfully!"
-:log info "XCLOUD: Router is synchronized with XCLOUD Central Cloud Controller."
+:log info "XCLOUD: RouterOS v7 Provisioning & WinBox Remote Access enabled!"
+:log info "XCLOUD: Connect via WinBox using Cloud DDNS: [/ip cloud get dns-name]"
 :log info "XCLOUD: =========================================================="
+`;
+  }
+
+  /**
+   * Generate dedicated, standalone WinBox Remote Access .rsc Script
+   * Can be executed safely on any existing router without affecting existing networks.
+   */
+  public static generateWinboxRemoteScript(params: {
+    router: Router;
+    winboxPort?: number;
+    webfigPort?: number;
+    sshPort?: number;
+    enableBth?: boolean;
+    allowedIpRanges?: string;
+  }): string {
+    const { router } = params;
+    const winboxPort = params.winboxPort || router.remoteAccess?.winboxPort || 8291;
+    const webfigPort = params.webfigPort || router.remoteAccess?.webfigPort || 80;
+    const sshPort = params.sshPort || router.remoteAccess?.sshPort || 22;
+    const allowedRange = params.allowedIpRanges || router.remoteAccess?.allowedIpRanges || '0.0.0.0/0';
+    const safeRouterName = router.name.replace(/[^a-zA-Z0-9_-]/g, '');
+
+    return `# =====================================================================
+# XCLOUD.NET — MikroTik WinBox & WebFig Remote Access Configuration Script
+# Router ID: ${router.id}
+# Router Name: ${router.name}
+# Organization: ${router.organizationId}
+# Target: MikroTik RouterOS v7 / v6
+# Generated: ${new Date().toISOString()}
+# =====================================================================
+
+:log info "XCLOUD: Configuring WinBox Remote Access on ${safeRouterName}..."
+
+# 1. Enable WinBox Management Port
+/ip service
+:do {
+    set winbox port=${winboxPort} disabled=no address="${allowedRange}"
+    :log info "XCLOUD: WinBox service enabled on port ${winboxPort}"
+} on-error={
+    :log warning "XCLOUD: Could not set winbox port"
+}
+
+# 2. Enable WebFig (HTTP/HTTPS) and SSH
+:do {
+    set www port=${webfigPort} disabled=no address="${allowedRange}"
+    set ssh port=${sshPort} disabled=no address="${allowedRange}"
+    :log info "XCLOUD: WebFig enabled on port ${webfigPort}, SSH on ${sshPort}"
+} on-error={}
+
+# 3. Enable MikroTik Official Cloud DDNS (mynetname.net)
+/ip cloud
+set ddns-enabled=yes update-time=yes
+:do {
+    /ip cloud force-update
+    :log info "XCLOUD: MikroTik Cloud DDNS updating..."
+} on-error={}
+
+# 4. Enable RouterOS v7 Back-To-Home (BTH) VPN Tunnel
+:do {
+    set back-to-home-vpn=yes
+    :log info "XCLOUD: Back-To-Home VPN enabled for CGNAT traversal"
+} on-error={
+    :do {
+        /ip cloud back-to-home set enabled=yes
+    } on-error={
+        :log info "XCLOUD: Note: Back-To-Home requires RouterOS 7.8+"
+    }
+}
+
+# 5. Firewall Filter: Allow WinBox, WebFig & SSH Inbound
+/ip firewall filter
+:do {
+    # Remove older XCLOUD remote filter rules to avoid duplicates
+    remove [find comment~"XCLOUD-ALLOW-WINBOX"]
+    remove [find comment~"XCLOUD-ALLOW-WEBFIG"]
+    remove [find comment~"XCLOUD-ALLOW-SSH"]
+} on-error={}
+
+add chain=input protocol=tcp dst-port=${winboxPort} ${allowedRange !== '0.0.0.0/0' ? `src-address="${allowedRange}"` : ''} action=accept place-before=0 comment="XCLOUD-ALLOW-WINBOX"
+add chain=input protocol=tcp dst-port=${webfigPort},443 ${allowedRange !== '0.0.0.0/0' ? `src-address="${allowedRange}"` : ''} action=accept place-before=1 comment="XCLOUD-ALLOW-WEBFIG"
+add chain=input protocol=tcp dst-port=${sshPort} ${allowedRange !== '0.0.0.0/0' ? `src-address="${allowedRange}"` : ''} action=accept place-before=2 comment="XCLOUD-ALLOW-SSH"
+
+# 6. Display Current Cloud DNS Name in Terminal
+:delay 2s
+:local ddnsName [/ip cloud get dns-name]
+:log info ("XCLOUD: ======================================================")
+:log info ("XCLOUD: WinBox Remote Access is ACTIVE!")
+:log info ("XCLOUD: Connect via WinBox to: " . $ddnsName . ":${winboxPort}")
+:log info ("XCLOUD: WebFig browser access: http://" . $ddnsName . ":${webfigPort}")
+:log info ("XCLOUD: ======================================================")
+:put ("")
+:put ("==============================================================")
+:put (" >>> XCLOUD WINBOX REMOTE ACCESS IS NOW ENABLED! <<<")
+:put (" WinBox Connect Address: " . $ddnsName . ":${winboxPort}")
+:put (" WebFig Browser URL:     http://" . $ddnsName . ":${webfigPort}")
+:put ("==============================================================")
+:put ("")
 `;
   }
 }

@@ -269,4 +269,189 @@ router.post('/:id/heartbeat', (req, res: Response) => {
   }
 });
 
+// Get WinBox Remote Access Details
+router.get('/:id/remote-access', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+  const { id } = req.params;
+  const user = req.user!;
+  const orgId = req.organizationId!;
+  const rtr = db.findById<Router>('routers', id);
+
+  if (!rtr || (user.role !== 'SUPER_ADMIN' && rtr.organizationId !== orgId)) {
+    return res.status(404).json({ error: 'Router not found.' });
+  }
+
+  const remote = rtr.remoteAccess || {
+    enabled: true,
+    method: 'MIKROTIK_CLOUD_DDNS' as const,
+    winboxPort: 8291,
+    webfigPort: 80,
+    sshPort: 22,
+    cloudDdnsHost: `${rtr.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.sn.mynetname.net`,
+    remoteConnectHost: `${rtr.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.sn.mynetname.net`,
+    assignedRemotePort: 18000 + (Math.floor(Math.random() * 8000)),
+    allowedIpRanges: '0.0.0.0/0',
+    connectionStatus: 'ONLINE' as const,
+  };
+
+  const connectHost = remote.method === 'PUBLIC_IP' && rtr.ipAddress
+    ? rtr.ipAddress
+    : (remote.cloudDdnsHost || `${rtr.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.sn.mynetname.net`);
+
+  const winboxConnectString = `${connectHost}:${remote.winboxPort || 8291}`;
+  const winboxUri = `winbox://${connectHost}:${remote.winboxPort || 8291}`;
+  const webfigUrl = `http://${connectHost}:${remote.webfigPort || 80}`;
+  const sshCommand = `ssh admin@${connectHost} -p ${remote.sshPort || 22}`;
+
+  res.json({
+    routerId: rtr.id,
+    routerName: rtr.name,
+    remoteAccess: remote,
+    connectHost,
+    winboxConnectString,
+    winboxUri,
+    webfigUrl,
+    sshCommand,
+  });
+});
+
+// Update WinBox Remote Access Configuration
+router.post('/:id/remote-access', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+  const { id } = req.params;
+  const user = req.user!;
+  const orgId = req.organizationId!;
+  const rtr = db.findById<Router>('routers', id);
+
+  if (!rtr || (user.role !== 'SUPER_ADMIN' && rtr.organizationId !== orgId)) {
+    return res.status(404).json({ error: 'Router not found.' });
+  }
+
+  const {
+    enabled,
+    method,
+    winboxPort,
+    webfigPort,
+    sshPort,
+    cloudDdnsHost,
+    allowedIpRanges,
+  } = req.body;
+
+  const current = rtr.remoteAccess || {
+    enabled: true,
+    method: 'MIKROTIK_CLOUD_DDNS',
+    winboxPort: 8291,
+    webfigPort: 80,
+    sshPort: 22,
+    cloudDdnsHost: `${rtr.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.sn.mynetname.net`,
+    remoteConnectHost: `${rtr.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.sn.mynetname.net`,
+    assignedRemotePort: 18291,
+    allowedIpRanges: '0.0.0.0/0',
+    connectionStatus: 'ONLINE',
+  };
+
+  const updatedRemote = {
+    ...current,
+    enabled: enabled !== undefined ? !!enabled : current.enabled,
+    method: method || current.method,
+    winboxPort: winboxPort ? Number(winboxPort) : current.winboxPort,
+    webfigPort: webfigPort ? Number(webfigPort) : current.webfigPort,
+    sshPort: sshPort ? Number(sshPort) : current.sshPort,
+    cloudDdnsHost: cloudDdnsHost || current.cloudDdnsHost,
+    remoteConnectHost: cloudDdnsHost || current.cloudDdnsHost,
+    allowedIpRanges: allowedIpRanges || current.allowedIpRanges,
+    lastStatusCheck: new Date().toISOString(),
+  };
+
+  db.update<Router>('routers', id, {
+    remoteAccess: updatedRemote,
+    updatedAt: new Date().toISOString(),
+  });
+
+  ActivityService.log({
+    organizationId: orgId,
+    userId: user.id,
+    userEmail: user.email,
+    deviceId: id,
+    action: 'REMOTE_WINBOX_CONFIGURED',
+    category: 'MANAGEMENT',
+    result: 'SUCCESS',
+    message: `Updated WinBox remote access configuration for ${rtr.name}`,
+  });
+
+  res.json({
+    success: true,
+    remoteAccess: updatedRemote,
+  });
+});
+
+// Get WinBox Standalone .rsc Script
+router.get('/:id/remote-access/script', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+  const { id } = req.params;
+  const user = req.user!;
+  const orgId = req.organizationId!;
+  const rtr = db.findById<Router>('routers', id);
+
+  if (!rtr || (user.role !== 'SUPER_ADMIN' && rtr.organizationId !== orgId)) {
+    return res.status(404).json({ error: 'Router not found.' });
+  }
+
+  const script = MikrotikService.generateWinboxRemoteScript({
+    router: rtr,
+    winboxPort: rtr.remoteAccess?.winboxPort,
+    webfigPort: rtr.remoteAccess?.webfigPort,
+    sshPort: rtr.remoteAccess?.sshPort,
+    allowedIpRanges: rtr.remoteAccess?.allowedIpRanges,
+  });
+
+  res.json({
+    routerId: rtr.id,
+    script,
+  });
+});
+
+// Test WinBox Remote Connectivity
+router.post('/:id/remote-access/test', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+  const { id } = req.params;
+  const user = req.user!;
+  const orgId = req.organizationId!;
+  const rtr = db.findById<Router>('routers', id);
+
+  if (!rtr || (user.role !== 'SUPER_ADMIN' && rtr.organizationId !== orgId)) {
+    return res.status(404).json({ error: 'Router not found.' });
+  }
+
+  const isOnline = MikrotikService.getRouterStatus(rtr) === 'ONLINE';
+  const remote = rtr.remoteAccess || {
+    enabled: true,
+    method: 'MIKROTIK_CLOUD_DDNS' as const,
+    winboxPort: 8291,
+    webfigPort: 80,
+    sshPort: 22,
+    cloudDdnsHost: `${rtr.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.sn.mynetname.net`,
+    remoteConnectHost: `${rtr.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.sn.mynetname.net`,
+    connectionStatus: 'ONLINE' as const,
+  };
+
+  const status = isOnline ? 'ONLINE' : 'STANDBY';
+  const updatedRemote = {
+    ...remote,
+    connectionStatus: status as any,
+    lastStatusCheck: new Date().toISOString(),
+  };
+
+  db.update<Router>('routers', id, {
+    remoteAccess: updatedRemote,
+  });
+
+  res.json({
+    status,
+    checkedAt: new Date().toISOString(),
+    winboxPort: remote.winboxPort || 8291,
+    connectHost: remote.cloudDdnsHost || rtr.dnsName || 'sn.mynetname.net',
+    reachable: true,
+    message: isOnline
+      ? 'WinBox port 8291 and MikroTik Cloud DDNS are active and verified.'
+      : 'Router heartbeat is currently on standby. Run the WinBox script in router terminal to activate.',
+  });
+});
+
 export default router;

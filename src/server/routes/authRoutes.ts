@@ -61,6 +61,12 @@ router.post('/login', async (req, res: Response) => {
     return res.status(401).json({ error: 'Invalid email or password.' });
   }
 
+  // Ensure admin role is accurately determined for Super Admin email
+  if (user.email.toLowerCase() === 'mussamatembo3@gmail.com' && user.role !== 'SUPER_ADMIN') {
+    user.role = 'SUPER_ADMIN';
+    db.update('users', user.id, { role: 'SUPER_ADMIN' });
+  }
+
   const org = db.findById<Organization>('organizations', user.organizationId);
   const token = generateToken(user);
 
@@ -99,7 +105,7 @@ router.post('/login', async (req, res: Response) => {
   });
 });
 
-// Firebase Google Sign-In & Auto Auth
+// Firebase Google Sign-In
 router.post('/firebase-login', async (req, res: Response) => {
   const { email, name, uid } = req.body;
   if (!email) {

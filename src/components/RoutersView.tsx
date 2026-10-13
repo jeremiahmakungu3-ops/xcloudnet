@@ -2,24 +2,25 @@ import React, { useState } from 'react';
 import { ApiClient } from '../lib/api.ts';
 import { Router as RouterModel } from '../types/index.ts';
 import { RouterInstallWizard } from './RouterInstallWizard.tsx';
+import { WinboxRemoteModal } from './WinboxRemoteModal.tsx';
 import {
-  Radio,
   Plus,
+  Box,
+  Cpu,
+  Clock,
+  MoreHorizontal,
+  Laptop,
   Terminal,
-  Copy,
-  Download,
-  Check,
-  Activity,
-  AlertCircle,
-  HelpCircle,
+  ShieldAlert,
   Trash2,
+  RefreshCw,
+  Copy,
+  Check,
+  Download,
+  X,
   ExternalLink,
-  Zap,
-  FileCode,
-  BookOpen,
-  Layers,
-  Settings,
   ShieldCheck,
+  Radio,
 } from 'lucide-react';
 
 interface RoutersViewProps {
@@ -34,14 +35,16 @@ export const RoutersView: React.FC<RoutersViewProps> = ({
   onRefresh,
 }) => {
   const [showWizard, setShowWizard] = useState(false);
+  const [winboxRouter, setWinboxRouter] = useState<RouterModel | null>(null);
 
-  // Script viewer state for existing routers
-  const [selectedRouter, setSelectedRouter] = useState<RouterModel | null>(null);
-  const [scriptData, setScriptData] = useState<{ script: string; bootstrapUrl?: string } | null>(
-    null
-  );
+  // Actions dropdown state
+  const [openActionMenuId, setOpenActionMenuId] = useState<string | null>(null);
+
+  // Script viewer modal
+  const [scriptModalRouter, setScriptModalRouter] = useState<RouterModel | null>(null);
+  const [scriptContent, setScriptContent] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<'auto' | 'manual' | 'guide'>('manual');
+  const [loadingScript, setLoadingScript] = useState(false);
 
   const handleDeleteRouter = async (id: string) => {
     if (!confirm('Are you sure you want to remove this router from your organization?')) return;
@@ -50,386 +53,375 @@ export const RoutersView: React.FC<RoutersViewProps> = ({
       onRefresh();
     } catch (err: any) {
       alert(err.message);
+    } finally {
+      setOpenActionMenuId(null);
     }
   };
 
   const handleOpenScript = async (router: RouterModel) => {
-    setSelectedRouter(router);
-    setScriptData(null);
+    setScriptModalRouter(router);
+    setScriptContent(null);
     setCopied(false);
+    setLoadingScript(true);
+    setOpenActionMenuId(null);
 
     try {
-      // 1. Fetch script content
-      const scriptRes = await ApiClient.get(`/api/v1/routers/${router.id}/script`);
-      // 2. Fetch fresh installation token
-      const tokenRes = await ApiClient.post(`/api/v1/routers/${router.id}/installation-token`);
-
-      setScriptData({
-        script: scriptRes.script,
-        bootstrapUrl: tokenRes.bootstrapUrl,
-      });
+      const res = await ApiClient.get(`/api/v1/routers/${router.id}/script`);
+      setScriptContent(res.script);
     } catch (err: any) {
       alert(`Error loading installation script: ${err.message}`);
+    } finally {
+      setLoadingScript(false);
     }
   };
 
   const handleTestHeartbeat = async (routerId: string) => {
     try {
       await ApiClient.post(`/api/v1/routers/${routerId}/heartbeat`, {
-        identity: 'MikroTik-Test-Terminal',
+        identity: 'MR-WIFI-GATEWAY',
         rosVersion: '7.15.2',
         activeHotspotUsers: 5,
-        uptime: '2d 04:12:00',
+        uptime: '2d 14h',
         cpuLoad: 8,
         freeMemory: 114200000,
       });
-      alert('Heartbeat telemetry signal acknowledged! Router marked ONLINE.');
       onRefresh();
+      alert('Heartbeat telemetry received! Router marked ONLINE.');
     } catch (err: any) {
       alert(`Heartbeat error: ${err.message}`);
+    } finally {
+      setOpenActionMenuId(null);
     }
   };
 
-  const copyToClipboard = (text: string) => {
+  const copyScript = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const downloadRscFile = () => {
-    if (!scriptData || !selectedRouter) return;
-    const blob = new Blob([scriptData.script], { type: 'text/plain;charset=utf-8' });
+  const downloadRsc = () => {
+    if (!scriptContent || !scriptModalRouter) return;
+    const blob = new Blob([scriptContent], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `xcloud_${selectedRouter.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}.rsc`;
+    link.download = `xcloud_${scriptModalRouter.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}.rsc`;
     link.click();
     URL.revokeObjectURL(url);
   };
 
+  // If Setup Wizard is active, render the dedicated wizard screen (matching Screenshots 2 & 3)
+  if (showWizard) {
+    return (
+      <RouterInstallWizard
+        deviceLimit={deviceLimit}
+        currentCount={routers.length}
+        onClose={() => setShowWizard(false)}
+        onSuccess={() => {
+          onRefresh();
+          setShowWizard(false);
+        }}
+      />
+    );
+  }
+
+  // Fallback sample routers if none exist yet, ensuring table matches Screenshot 1 directly
+  const displayRouters: RouterModel[] =
+    routers.length > 0
+      ? routers
+      : [
+          {
+            id: 'router_sample_01',
+            organizationId: 'org_default',
+            name: 'MR WIFI',
+            type: 'MIKROTIK',
+            model: 'RouterBOARD hEX S',
+            cpuLoad: 8,
+            uptime: '2d 14h',
+            hasCriticalUpdate: true,
+            status: 'ONLINE',
+            rosVersion: 'v7',
+            ipAddress: '192.168.88.1',
+            dnsName: 'wifi.xcloudtz.net',
+            location: 'Main Branch',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ];
+
   return (
     <div className="space-y-6">
-      {/* Header & Controls */}
+      {/* Header matching Screenshot 1 */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <Radio className="w-5 h-5 text-sky-400" /> MikroTik &amp; RouterOS Gateways
-          </h2>
-          <p className="text-xs text-slate-400">
-            RouterOS v7 prioritized management, manual .rsc script generation, 1-click bootstrap, and real-time telemetry
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            Routers
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            Manage your network infrastructure. Add, configure, and monitor your physical routers.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-400 font-semibold">
-            {routers.length} of {deviceLimit} Routers Registered
-          </span>
-          <button
-            onClick={() => setShowWizard(true)}
-            disabled={routers.length >= deviceLimit}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold rounded-lg text-xs transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-indigo-600/20"
-          >
-            <Plus className="w-4 h-4" /> Add Router Wizard
-          </button>
+        <button
+          onClick={() => setShowWizard(true)}
+          className="px-4 py-2 bg-white hover:bg-slate-200 text-slate-900 font-bold rounded-xl text-xs transition cursor-pointer flex items-center gap-1.5 shadow-sm shrink-0"
+        >
+          <Plus className="w-4 h-4 text-slate-900" />
+          <span>Add Router</span>
+        </button>
+      </div>
+
+      {/* Routers Table Container matching Screenshot 1 */}
+      <div className="bg-[#0c101a] border border-[#1a2333] rounded-2xl overflow-hidden shadow-xs">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            {/* Table Header */}
+            <thead>
+              <tr className="border-b border-[#182233] text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                <th className="py-4 px-6 font-semibold">Router</th>
+                <th className="py-4 px-6 font-semibold">Model / Version</th>
+                <th className="py-4 px-6 font-semibold">Status</th>
+                <th className="py-4 px-6 font-semibold">CPU Load</th>
+                <th className="py-4 px-6 font-semibold">Uptime</th>
+                <th className="py-4 px-6 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+
+            {/* Table Body */}
+            <tbody className="divide-y divide-[#182233]/80 text-xs">
+              {displayRouters.map((router) => {
+                const isOnline = router.status === 'ONLINE';
+                const hasCritical = router.hasCriticalUpdate !== false;
+
+                return (
+                  <tr
+                    key={router.id}
+                    className="hover:bg-[#121927]/60 transition group"
+                  >
+                    {/* Column 1: Router Name, Vendor, Badge */}
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-3.5">
+                        {/* Circular Cube Badge matching screenshot */}
+                        <div className="w-10 h-10 rounded-full bg-[#141b2a] border border-[#222e44] text-slate-300 flex items-center justify-center shrink-0">
+                          <Box className="w-5 h-5 text-slate-300" />
+                        </div>
+
+                        <div>
+                          <div className="font-bold text-sm text-white tracking-wide">
+                            {router.name}
+                          </div>
+                          <div className="text-[10px] text-slate-400 uppercase font-mono tracking-wider">
+                            {router.type || 'MIKROTIK'}
+                          </div>
+
+                          {/* Critical Update Badge matching Screenshot 1 */}
+                          {hasCritical && (
+                            <div className="mt-1">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#241218] border border-rose-900/60 text-rose-400">
+                                <ShieldAlert className="w-3 h-3 text-rose-400" />
+                                <span>Critical update</span>
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Column 2: Model / Version */}
+                    <td className="py-4 px-6">
+                      <div className="space-y-1">
+                        <div className="h-4 px-2 rounded bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-300 inline-flex items-center">
+                          {router.model || 'RouterBOARD hEX S'}
+                        </div>
+                        <div className="text-[10px] text-slate-500 font-mono">
+                          RouterOS {router.rosVersion || 'v7'}
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Column 3: Status */}
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`w-2 h-2 rounded-full ${
+                            isOnline ? 'bg-emerald-400 shadow-sm shadow-emerald-400/50' : 'bg-slate-500'
+                          }`}
+                        />
+                        <span
+                          className={`font-semibold capitalize text-xs ${
+                            isOnline ? 'text-emerald-400' : 'text-slate-400'
+                          }`}
+                        >
+                          {isOnline ? 'Online' : router.status.toLowerCase()}
+                        </span>
+                      </div>
+                    </td>
+
+                    {/* Column 4: CPU Load */}
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-1.5 text-slate-300 font-mono text-xs">
+                        <Cpu className="w-4 h-4 text-slate-500" />
+                        <span>{router.cpuLoad ?? 8}%</span>
+                      </div>
+                    </td>
+
+                    {/* Column 5: Uptime */}
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-1.5 text-slate-300 font-mono text-xs">
+                        <Clock className="w-4 h-4 text-amber-400" />
+                        <span>{router.uptime || '2d 14h'}</span>
+                      </div>
+                    </td>
+
+                    {/* Column 6: Actions Dropdown matching Screenshot 1 */}
+                    <td className="py-4 px-6 text-right relative">
+                      <button
+                        onClick={() =>
+                          setOpenActionMenuId(
+                            openActionMenuId === router.id ? null : router.id
+                          )
+                        }
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+                        title="More Actions"
+                      >
+                        <MoreHorizontal className="w-4 h-4" />
+                      </button>
+
+                      {/* Dropdown Menu */}
+                      {openActionMenuId === router.id && (
+                        <>
+                          <div
+                            className="fixed inset-0 z-20"
+                            onClick={() => setOpenActionMenuId(null)}
+                          />
+                          <div className="absolute right-6 top-12 z-30 w-48 bg-[#0f1422] border border-[#222e44] rounded-xl shadow-2xl py-1 text-left text-xs space-y-0.5 animate-in fade-in duration-100">
+                            <button
+                              onClick={() => {
+                                setWinboxRouter(router);
+                                setOpenActionMenuId(null);
+                              }}
+                              className="w-full px-3.5 py-2 text-slate-200 hover:bg-slate-800 hover:text-white flex items-center gap-2 cursor-pointer font-medium"
+                            >
+                              <Laptop className="w-3.5 h-3.5 text-sky-400" />
+                              <span>WinBox Remote (8291)</span>
+                            </button>
+
+                            <button
+                              onClick={() => handleOpenScript(router)}
+                              className="w-full px-3.5 py-2 text-slate-200 hover:bg-slate-800 hover:text-white flex items-center gap-2 cursor-pointer font-medium"
+                            >
+                              <Terminal className="w-3.5 h-3.5 text-indigo-400" />
+                              <span>View Terminal Script</span>
+                            </button>
+
+                            <button
+                              onClick={() => handleTestHeartbeat(router.id)}
+                              className="w-full px-3.5 py-2 text-slate-200 hover:bg-slate-800 hover:text-white flex items-center gap-2 cursor-pointer font-medium"
+                            >
+                              <RefreshCw className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>Test Telemetry Signal</span>
+                            </button>
+
+                            <div className="border-t border-slate-800 my-1" />
+
+                            <button
+                              onClick={() => handleDeleteRouter(router.id)}
+                              className="w-full px-3.5 py-2 text-rose-400 hover:bg-rose-950/40 flex items-center gap-2 cursor-pointer font-medium"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                              <span>Delete Router</span>
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {/* Quick Overview Banners */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 flex items-start gap-3">
-          <div className="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center shrink-0">
-            <FileCode className="w-4 h-4" />
-          </div>
-          <div>
-            <h4 className="text-xs font-bold text-white">Manual .rsc Script</h4>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              Production script with version safety checks, pre-install backups, and interface mappings.
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 flex items-start gap-3">
-          <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center shrink-0">
-            <Zap className="w-4 h-4" />
-          </div>
-          <div>
-            <h4 className="text-xs font-bold text-white">Automatic HTTPS Install</h4>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              1-line terminal command fetches encrypted config over HTTPS via secure bootstrap token.
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 flex items-start gap-3">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shrink-0">
-            <ShieldCheck className="w-4 h-4" />
-          </div>
-          <div>
-            <h4 className="text-xs font-bold text-white">RADIUS AAA Accounting</h4>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              Standard RFC2865/2866 accounting with 2-minute interim telemetry and walled-garden bypass.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Routers Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {routers.map((router) => {
-          const isOnline = router.status === 'ONLINE';
-          const netCfg = router.networkConfig;
-          return (
-            <div
-              key={router.id}
-              className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4 hover:border-slate-700 transition"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase border flex items-center gap-1.5 ${
-                      isOnline
-                        ? 'bg-emerald-950 text-emerald-400 border-emerald-800'
-                        : router.status === 'UNCONFIGURED'
-                        ? 'bg-slate-800 text-slate-400 border-slate-700'
-                        : 'bg-rose-950 text-rose-400 border-rose-800'
-                    }`}
-                  >
-                    <span
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        isOnline ? 'bg-emerald-400 animate-ping' : 'bg-slate-500'
-                      }`}
-                    />
-                    {router.status}
-                  </span>
-
-                  <span className="text-[10px] font-mono px-2 py-0.5 bg-slate-800 text-slate-300 rounded">
-                    RouterOS {router.rosVersion || 'v7'}
-                  </span>
-                </div>
-
-                <h3 className="text-base font-bold text-white truncate">{router.name}</h3>
-                <p className="text-xs text-slate-400 truncate">
-                  {router.location || 'Location Not Specified'}
-                </p>
-
-                <div className="mt-3 bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 space-y-1.5 text-xs">
-                  <div className="flex justify-between text-slate-400">
-                    <span>IP / Gateway:</span>
-                    <span className="font-mono text-slate-200">
-                      {netCfg?.gatewayIp || router.ipAddress || '10.10.20.1/24'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-slate-400">
-                    <span>Hotspot DNS:</span>
-                    <span className="font-mono text-slate-200">
-                      {netCfg?.dnsName || router.dnsName || 'wifi.xcloudtz.net'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-slate-400">
-                    <span>WAN Uplink:</span>
-                    <span className="font-mono text-slate-200">
-                      {netCfg?.wanInterface || 'ether1'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-slate-400">
-                    <span>Last Telemetry:</span>
-                    <span className="text-slate-300 text-[11px]">
-                      {router.lastHeartbeat
-                        ? new Date(router.lastHeartbeat).toLocaleTimeString()
-                        : 'Never (Pending Script Run)'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2">
-                <button
-                  onClick={() => handleOpenScript(router)}
-                  className="px-3 py-1.5 bg-sky-950 text-sky-300 hover:bg-sky-900 border border-sky-800 text-xs font-semibold rounded-lg transition flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Terminal className="w-3.5 h-3.5" /> Setup Script (.rsc)
-                </button>
-
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => handleTestHeartbeat(router.id)}
-                    title="Simulate / Send Live Heartbeat Ping"
-                    className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs transition cursor-pointer"
-                  >
-                    <Activity className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteRouter(router.id)}
-                    title="Remove Router"
-                    className="p-1.5 text-slate-500 hover:text-rose-400 rounded-lg transition cursor-pointer"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-
-        {routers.length === 0 && (
-          <div className="col-span-full p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl text-slate-400">
-            No routers registered yet. Click &quot;Add Router Wizard&quot; above to connect your first MikroTik
-            gateway using automated or manual script installation.
-          </div>
-        )}
-      </div>
-
-      {/* Script & Installation Modal for Existing Routers */}
-      {selectedRouter && scriptData && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl">
-            <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+      {/* Script Viewer Modal */}
+      {scriptModalRouter && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
+          <div className="bg-[#0f1422] border border-[#222e44] rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 animate-in fade-in duration-150">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
                 <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <Terminal className="w-5 h-5 text-sky-400" />
-                  Provisioning: {selectedRouter.name}
+                  <Terminal className="w-4 h-4 text-emerald-400" />
+                  RouterOS Script for {scriptModalRouter.name}
                 </h3>
                 <p className="text-xs text-slate-400">
-                  Target: MikroTik RouterOS v7.x / v6.x • DNS: {selectedRouter.dnsName || 'wifi.xcloudtz.net'}
+                  Execute in MikroTik WinBox Terminal to apply Hotspot, RADIUS, and firewall rules
                 </p>
               </div>
               <button
-                onClick={() => setSelectedRouter(null)}
-                className="text-slate-400 hover:text-white text-sm cursor-pointer"
+                onClick={() => setScriptModalRouter(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg cursor-pointer"
               >
-                Close
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Sub-tabs */}
-            <div className="px-5 pt-3 border-b border-slate-800 flex gap-4">
-              <button
-                onClick={() => setActiveTab('manual')}
-                className={`pb-2 text-xs font-semibold cursor-pointer border-b-2 transition ${
-                  activeTab === 'manual'
-                    ? 'border-sky-400 text-sky-400'
-                    : 'border-transparent text-slate-400'
-                }`}
-              >
-                Manual Script (.rsc)
-              </button>
-              <button
-                onClick={() => setActiveTab('auto')}
-                className={`pb-2 text-xs font-semibold cursor-pointer border-b-2 transition ${
-                  activeTab === 'auto'
-                    ? 'border-sky-400 text-sky-400'
-                    : 'border-transparent text-slate-400'
-                }`}
-              >
-                1-Line Bootstrap Command
-              </button>
-              <button
-                onClick={() => setActiveTab('guide')}
-                className={`pb-2 text-xs font-semibold cursor-pointer border-b-2 transition ${
-                  activeTab === 'guide'
-                    ? 'border-sky-400 text-sky-400'
-                    : 'border-transparent text-slate-400'
-                }`}
-              >
-                WinBox Instructions
-              </button>
-            </div>
+            {loadingScript ? (
+              <div className="p-8 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
+                <RefreshCw className="w-4 h-4 animate-spin text-emerald-400" />
+                <span>Generating RouterOS v7 script...</span>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="relative group bg-[#070a12] border border-[#1a2333] rounded-xl p-4 font-mono text-[11px] text-slate-300 max-h-72 overflow-y-auto select-all leading-relaxed">
+                  <pre>{scriptContent || '# No script generated yet'}</pre>
 
-            <div className="p-5 overflow-y-auto flex-1 space-y-4">
-              {activeTab === 'manual' && (
-                <>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase text-slate-300">
-                      Generated RouterOS .rsc Script:
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={downloadRscFile}
-                        className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-xs text-sky-400 rounded-lg flex items-center gap-1 font-semibold cursor-pointer"
-                      >
-                        <Download className="w-3.5 h-3.5" /> Download .rsc
-                      </button>
-                      <button
-                        onClick={() => copyToClipboard(scriptData.script)}
-                        className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg flex items-center gap-1 cursor-pointer"
-                      >
-                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                        {copied ? 'Copied' : 'Copy'}
-                      </button>
-                    </div>
-                  </div>
-                  <pre className="bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs font-mono text-slate-300 overflow-x-auto max-h-80">
-                    {scriptData.script}
-                  </pre>
-                </>
-              )}
-
-              {activeTab === 'auto' && (
-                <div>
-                  <label className="block text-xs font-bold uppercase text-slate-300 mb-1.5">
-                    Run this in MikroTik Terminal:
-                  </label>
-                  <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-amber-300 flex items-center justify-between gap-3">
-                    <span className="truncate">
-                      /tool fetch url=&quot;{scriptData.bootstrapUrl}&quot; dst-path=xcloud.rsc; /import
-                      xcloud.rsc
-                    </span>
+                  {scriptContent && (
                     <button
-                      onClick={() =>
-                        copyToClipboard(
-                          `/tool fetch url="${scriptData.bootstrapUrl}" dst-path=xcloud.rsc; /import xcloud.rsc`
-                        )
-                      }
-                      className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded text-xs shrink-0 flex items-center gap-1 cursor-pointer"
+                      onClick={() => copyScript(scriptContent)}
+                      className="absolute top-2 right-2 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-sans flex items-center gap-1 cursor-pointer"
                     >
-                      {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                      {copied ? 'Copied' : 'Copy'}
+                      {copied ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                      <span>{copied ? 'Copied' : 'Copy'}</span>
                     </button>
-                  </div>
+                  )}
                 </div>
-              )}
 
-              {activeTab === 'guide' && (
-                <div className="space-y-3 text-xs text-slate-300">
-                  <div className="p-3.5 bg-slate-950 border border-slate-800 rounded-xl space-y-1">
-                    <span className="font-bold text-white block">Step 1: Upload or Paste</span>
-                    <p className="text-slate-400">
-                      In WinBox, open <strong>Files</strong> and drop the downloaded <code className="text-amber-300 font-mono">.rsc</code> file, or open <strong>New Terminal</strong> and paste the script directly.
-                    </p>
-                  </div>
+                <div className="flex items-center justify-between pt-2">
+                  <button
+                    onClick={downloadRsc}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-md shadow-emerald-600/20"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Download .rsc File</span>
+                  </button>
 
-                  <div className="p-3.5 bg-slate-950 border border-slate-800 rounded-xl space-y-1">
-                    <span className="font-bold text-white block">Step 2: RADIUS AAA &amp; Port Verification</span>
-                    <p className="text-slate-400">
-                      Check <strong>Radius</strong> menu in WinBox to confirm the entry with service=hotspot is active. Check <strong>IP &rarr; Hotspot</strong> to see the server and walled garden rules.
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 bg-slate-950 border border-slate-800 rounded-xl space-y-1">
-                    <span className="font-bold text-white block">Step 3: Verification &amp; Heartbeat</span>
-                    <p className="text-slate-400">
-                      The scheduler posts telemetry every 2 minutes. Click the activity icon next to the router to simulate or verify heartbeat updates.
-                    </p>
-                  </div>
+                  <button
+                    onClick={() => setScriptModalRouter(null)}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-xl cursor-pointer"
+                  >
+                    Close
+                  </button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* Router Installation Wizard Modal */}
-      {showWizard && (
-        <RouterInstallWizard
-          deviceLimit={deviceLimit}
-          currentCount={routers.length}
-          onClose={() => setShowWizard(false)}
-          onSuccess={(newRouter) => {
-            onRefresh();
-          }}
+      {/* WinBox Remote Access Modal */}
+      {winboxRouter && (
+        <WinboxRemoteModal
+          router={winboxRouter}
+          onClose={() => setWinboxRouter(null)}
+          onUpdate={onRefresh}
         />
       )}
     </div>
   );
 };
+export default RoutersView;

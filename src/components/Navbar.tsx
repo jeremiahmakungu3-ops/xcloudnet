@@ -13,6 +13,7 @@ import {
   Sliders,
   DollarSign,
   Activity,
+  Globe,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -41,6 +42,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'omada', label: 'Omada SDN', icon: Server },
     { id: 'packages', label: 'Hotspot Plans', icon: Layers },
     { id: 'vouchers', label: 'Vouchers', icon: Ticket },
+    { id: 'captive-portal', label: 'Captive Portal', icon: Globe },
     { id: 'sessions', label: 'RADIUS Sessions', icon: Wifi },
     { id: 'agents', label: 'Agents & POS', icon: Users },
     { id: 'payments', label: 'Billing & Cash', icon: DollarSign },

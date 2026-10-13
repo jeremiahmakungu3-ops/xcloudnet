@@ -296,6 +296,38 @@
       "ownerId": "u2",
       "slug": "limited-org-217822",
       "currency": "TZS"
+    },
+    {
+      "id": "org_test_101709",
+      "name": "Kilimanjaro Wireless Networks",
+      "ownerId": "user_staff_test_101709",
+      "slug": "kilimanjaro-wireless",
+      "currency": "TZS",
+      "createdAt": "2026-10-11T13:25:01.709Z",
+      "updatedAt": "2026-10-11T13:25:01.709Z"
+    },
+    {
+      "id": "org_limit_test_101709",
+      "name": "Limited Devices Org",
+      "ownerId": "u2",
+      "slug": "limited-org-101709",
+      "currency": "TZS"
+    },
+    {
+      "id": "org_test_260657",
+      "name": "Kilimanjaro Wireless Networks",
+      "ownerId": "user_staff_test_260657",
+      "slug": "kilimanjaro-wireless",
+      "currency": "TZS",
+      "createdAt": "2026-10-11T21:31:00.657Z",
+      "updatedAt": "2026-10-11T21:31:00.657Z"
+    },
+    {
+      "id": "org_limit_test_260657",
+      "name": "Limited Devices Org",
+      "ownerId": "u2",
+      "slug": "limited-org-260657",
+      "currency": "TZS"
     }
   ],
   "org_subscriptions": [
@@ -719,6 +751,54 @@
       "currentPeriodEnd": "2026-11-09T23:00:17.850Z",
       "gracePeriodEnd": "2026-11-12T23:00:17.850Z",
       "deviceLimit": 2
+    },
+    {
+      "id": "sub_1791725101742_6ala",
+      "organizationId": "org_test_101709",
+      "planId": "plan_xcloud_standard",
+      "status": "ACTIVE",
+      "currentPeriodStart": "2026-10-11T13:25:01.742Z",
+      "currentPeriodEnd": "2026-12-10T13:25:01.742Z",
+      "gracePeriodEnd": "2026-12-13T13:25:01.742Z",
+      "deviceLimit": 6,
+      "autoRenew": false,
+      "createdAt": "2026-10-11T13:25:01.742Z",
+      "updatedAt": "2026-10-11T13:25:01.743Z",
+      "lastPaymentId": "tx_1791725101710_npq8"
+    },
+    {
+      "id": "sub_test_limit_101709",
+      "organizationId": "org_limit_test_101709",
+      "planId": "plan_xcloud_standard",
+      "status": "ACTIVE",
+      "currentPeriodStart": "2026-10-11T13:25:01.743Z",
+      "currentPeriodEnd": "2026-11-10T13:25:01.743Z",
+      "gracePeriodEnd": "2026-11-13T13:25:01.743Z",
+      "deviceLimit": 2
+    },
+    {
+      "id": "sub_1791754260685_33kd",
+      "organizationId": "org_test_260657",
+      "planId": "plan_xcloud_standard",
+      "status": "ACTIVE",
+      "currentPeriodStart": "2026-10-11T21:31:00.685Z",
+      "currentPeriodEnd": "2026-12-10T21:31:00.685Z",
+      "gracePeriodEnd": "2026-12-13T21:31:00.685Z",
+      "deviceLimit": 6,
+      "autoRenew": false,
+      "createdAt": "2026-10-11T21:31:00.685Z",
+      "updatedAt": "2026-10-11T21:31:00.685Z",
+      "lastPaymentId": "tx_1791754260660_xirs"
+    },
+    {
+      "id": "sub_test_limit_260657",
+      "organizationId": "org_limit_test_260657",
+      "planId": "plan_xcloud_standard",
+      "status": "ACTIVE",
+      "currentPeriodStart": "2026-10-11T21:31:00.685Z",
+      "currentPeriodEnd": "2026-11-10T21:31:00.685Z",
+      "gracePeriodEnd": "2026-11-13T21:31:00.685Z",
+      "deviceLimit": 2
     }
   ],
   "users": [
@@ -822,7 +902,7 @@
     {
       "id": "router_mikrotik_001",
       "organizationId": "org_mussa_telecom",
-      "name": "Dar City Center Gateway (RB750Gr3)",
+      "name": "MR WIFI",
       "type": "MIKROTIK",
       "ipAddress": "192.168.88.1",
       "dnsName": "hotspot.dar-center.xcloud.net",
@@ -837,7 +917,11 @@
       "installationTokenUsed": false,
       "createdAt": "2026-10-10T19:13:55.119Z",
       "updatedAt": "2026-10-10T21:16:29.141Z",
-      "installationTokenExpiresAt": "2026-10-10T22:16:29.141Z"
+      "installationTokenExpiresAt": "2026-10-10T22:16:29.141Z",
+      "model": "RouterBOARD hEX S",
+      "hasCriticalUpdate": true,
+      "cpuLoad": 8,
+      "uptime": "2d 14h"
     },
     {
       "id": "rtr_1791659828165_bcop",
@@ -1687,6 +1771,202 @@
       "installationTokenExpiresAt": "2026-10-11T00:00:17.854Z",
       "installationTokenUsed": false,
       "lastHeartbeat": "2026-10-10T23:00:17.855Z",
+      "identity": "RB750Gr3-MikroTik"
+    },
+    {
+      "id": "rtr_1791725101743_04h9",
+      "organizationId": "org_limit_test_101709",
+      "name": "Router 1",
+      "type": "MIKROTIK",
+      "ipAddress": "10.10.20.1",
+      "dnsName": "wifi.xcloudtz.net",
+      "apiPort": 8728,
+      "rosVersion": "v7",
+      "status": "UNCONFIGURED",
+      "location": "HQ",
+      "networkConfig": {
+        "wanInterface": "ether1",
+        "lanInterfaces": [
+          "ether2",
+          "ether3",
+          "ether4",
+          "ether5",
+          "wlan1",
+          "wlan2"
+        ],
+        "hotspotBridge": "bridge-hotspot",
+        "gatewayIp": "10.10.20.1/24",
+        "dhcpPool": "10.10.20.10-10.10.20.254",
+        "dnsName": "wifi.xcloudtz.net",
+        "installationMode": "NEW_CONFIGURATION",
+        "defaultRateLimit": "5M/5M"
+      },
+      "createdAt": "2026-10-11T13:25:01.744Z",
+      "updatedAt": "2026-10-11T13:25:01.744Z"
+    },
+    {
+      "id": "rtr_1791725101744_kros",
+      "organizationId": "org_limit_test_101709",
+      "name": "Router 2",
+      "type": "MIKROTIK",
+      "ipAddress": "10.10.20.1",
+      "dnsName": "wifi.xcloudtz.net",
+      "apiPort": 8728,
+      "rosVersion": "v7",
+      "status": "UNCONFIGURED",
+      "location": "HQ",
+      "networkConfig": {
+        "wanInterface": "ether1",
+        "lanInterfaces": [
+          "ether2",
+          "ether3",
+          "ether4",
+          "ether5",
+          "wlan1",
+          "wlan2"
+        ],
+        "hotspotBridge": "bridge-hotspot",
+        "gatewayIp": "10.10.20.1/24",
+        "dhcpPool": "10.10.20.10-10.10.20.254",
+        "dnsName": "wifi.xcloudtz.net",
+        "installationMode": "NEW_CONFIGURATION",
+        "defaultRateLimit": "5M/5M"
+      },
+      "createdAt": "2026-10-11T13:25:01.744Z",
+      "updatedAt": "2026-10-11T13:25:01.744Z"
+    },
+    {
+      "id": "rtr_1791725101747_3sbf",
+      "organizationId": "org_test_101709",
+      "name": "MikroTik Test Gateway",
+      "type": "MIKROTIK",
+      "ipAddress": "10.10.20.1",
+      "dnsName": "wifi.xcloudtz.net",
+      "apiPort": 8728,
+      "rosVersion": "v7",
+      "status": "ONLINE",
+      "location": "HQ",
+      "networkConfig": {
+        "wanInterface": "ether1",
+        "lanInterfaces": [
+          "ether2",
+          "ether3",
+          "ether4",
+          "ether5",
+          "wlan1",
+          "wlan2"
+        ],
+        "hotspotBridge": "bridge-hotspot",
+        "gatewayIp": "10.10.20.1/24",
+        "dhcpPool": "10.10.20.10-10.10.20.254",
+        "dnsName": "wifi.xcloudtz.net",
+        "installationMode": "NEW_CONFIGURATION",
+        "defaultRateLimit": "5M/5M"
+      },
+      "createdAt": "2026-10-11T13:25:01.747Z",
+      "updatedAt": "2026-10-11T13:25:01.749Z",
+      "installationToken": "ccd36747cc1cf344ba2aa77fa666e36027bfc6e173b5b011460f7fb486e9f575",
+      "installationTokenExpiresAt": "2026-10-11T14:25:01.748Z",
+      "installationTokenUsed": false,
+      "lastHeartbeat": "2026-10-11T13:25:01.749Z",
+      "identity": "RB750Gr3-MikroTik"
+    },
+    {
+      "id": "rtr_1791754260686_gafa",
+      "organizationId": "org_limit_test_260657",
+      "name": "Router 1",
+      "type": "MIKROTIK",
+      "ipAddress": "10.10.20.1",
+      "dnsName": "wifi.xcloudtz.net",
+      "apiPort": 8728,
+      "rosVersion": "v7",
+      "status": "UNCONFIGURED",
+      "location": "HQ",
+      "networkConfig": {
+        "wanInterface": "ether1",
+        "lanInterfaces": [
+          "ether2",
+          "ether3",
+          "ether4",
+          "ether5",
+          "wlan1",
+          "wlan2"
+        ],
+        "hotspotBridge": "bridge-hotspot",
+        "gatewayIp": "10.10.20.1/24",
+        "dhcpPool": "10.10.20.10-10.10.20.254",
+        "dnsName": "wifi.xcloudtz.net",
+        "installationMode": "NEW_CONFIGURATION",
+        "defaultRateLimit": "5M/5M"
+      },
+      "createdAt": "2026-10-11T21:31:00.686Z",
+      "updatedAt": "2026-10-11T21:31:00.686Z"
+    },
+    {
+      "id": "rtr_1791754260686_mpsm",
+      "organizationId": "org_limit_test_260657",
+      "name": "Router 2",
+      "type": "MIKROTIK",
+      "ipAddress": "10.10.20.1",
+      "dnsName": "wifi.xcloudtz.net",
+      "apiPort": 8728,
+      "rosVersion": "v7",
+      "status": "UNCONFIGURED",
+      "location": "HQ",
+      "networkConfig": {
+        "wanInterface": "ether1",
+        "lanInterfaces": [
+          "ether2",
+          "ether3",
+          "ether4",
+          "ether5",
+          "wlan1",
+          "wlan2"
+        ],
+        "hotspotBridge": "bridge-hotspot",
+        "gatewayIp": "10.10.20.1/24",
+        "dhcpPool": "10.10.20.10-10.10.20.254",
+        "dnsName": "wifi.xcloudtz.net",
+        "installationMode": "NEW_CONFIGURATION",
+        "defaultRateLimit": "5M/5M"
+      },
+      "createdAt": "2026-10-11T21:31:00.686Z",
+      "updatedAt": "2026-10-11T21:31:00.686Z"
+    },
+    {
+      "id": "rtr_1791754260688_bayo",
+      "organizationId": "org_test_260657",
+      "name": "MikroTik Test Gateway",
+      "type": "MIKROTIK",
+      "ipAddress": "10.10.20.1",
+      "dnsName": "wifi.xcloudtz.net",
+      "apiPort": 8728,
+      "rosVersion": "v7",
+      "status": "ONLINE",
+      "location": "HQ",
+      "networkConfig": {
+        "wanInterface": "ether1",
+        "lanInterfaces": [
+          "ether2",
+          "ether3",
+          "ether4",
+          "ether5",
+          "wlan1",
+          "wlan2"
+        ],
+        "hotspotBridge": "bridge-hotspot",
+        "gatewayIp": "10.10.20.1/24",
+        "dhcpPool": "10.10.20.10-10.10.20.254",
+        "dnsName": "wifi.xcloudtz.net",
+        "installationMode": "NEW_CONFIGURATION",
+        "defaultRateLimit": "5M/5M"
+      },
+      "createdAt": "2026-10-11T21:31:00.688Z",
+      "updatedAt": "2026-10-11T21:31:00.690Z",
+      "installationToken": "9a5050e367cbcf4b5828ff84ca4fcbe2dfea0e6d14f791657e77233db1ab9a89",
+      "installationTokenExpiresAt": "2026-10-11T22:31:00.689Z",
+      "installationTokenUsed": false,
+      "lastHeartbeat": "2026-10-11T21:31:00.690Z",
       "identity": "RB750Gr3-MikroTik"
     }
   ],
@@ -2968,6 +3248,146 @@
       "price": 500,
       "createdAt": "2026-10-10T23:00:17.853Z",
       "updatedAt": "2026-10-10T23:00:17.853Z"
+    },
+    {
+      "id": "vch_1791725101745_gdnp",
+      "organizationId": "org_test_101709",
+      "packageId": "pkg_1hr_unlimited",
+      "code": "XC-3581-3786",
+      "status": "USED",
+      "price": 500,
+      "transactionId": "tx_1791725101745_bv15",
+      "createdAt": "2026-10-11T13:25:01.745Z",
+      "updatedAt": "2026-10-11T13:25:01.746Z",
+      "activatedAt": "2026-10-11T13:25:01.746Z",
+      "expiresAt": "2026-10-11T14:25:01.746Z",
+      "usedByMac": "AA:BB:CC:DD:EE:01",
+      "usedByIp": "192.168.88.50"
+    },
+    {
+      "id": "vch_1791725101747_0_b0ee",
+      "organizationId": "org_test_101709",
+      "packageId": "pkg_1hr_unlimited",
+      "code": "TEST-1231-5706",
+      "batchId": "batch_1791725101747_48ac1e",
+      "status": "ACTIVE",
+      "price": 500,
+      "createdAt": "2026-10-11T13:25:01.747Z",
+      "updatedAt": "2026-10-11T13:25:01.747Z"
+    },
+    {
+      "id": "vch_1791725101747_1_kysu",
+      "organizationId": "org_test_101709",
+      "packageId": "pkg_1hr_unlimited",
+      "code": "TEST-5004-6258",
+      "batchId": "batch_1791725101747_48ac1e",
+      "status": "ACTIVE",
+      "price": 500,
+      "createdAt": "2026-10-11T13:25:01.747Z",
+      "updatedAt": "2026-10-11T13:25:01.747Z"
+    },
+    {
+      "id": "vch_1791725101747_2_n0c9",
+      "organizationId": "org_test_101709",
+      "packageId": "pkg_1hr_unlimited",
+      "code": "TEST-1999-3697",
+      "batchId": "batch_1791725101747_48ac1e",
+      "status": "ACTIVE",
+      "price": 500,
+      "createdAt": "2026-10-11T13:25:01.747Z",
+      "updatedAt": "2026-10-11T13:25:01.747Z"
+    },
+    {
+      "id": "vch_1791725101747_3_sp7p",
+      "organizationId": "org_test_101709",
+      "packageId": "pkg_1hr_unlimited",
+      "code": "TEST-2950-8178",
+      "batchId": "batch_1791725101747_48ac1e",
+      "status": "ACTIVE",
+      "price": 500,
+      "createdAt": "2026-10-11T13:25:01.747Z",
+      "updatedAt": "2026-10-11T13:25:01.747Z"
+    },
+    {
+      "id": "vch_1791725101747_4_ygsx",
+      "organizationId": "org_test_101709",
+      "packageId": "pkg_1hr_unlimited",
+      "code": "TEST-9430-7122",
+      "batchId": "batch_1791725101747_48ac1e",
+      "status": "ACTIVE",
+      "price": 500,
+      "createdAt": "2026-10-11T13:25:01.747Z",
+      "updatedAt": "2026-10-11T13:25:01.747Z"
+    },
+    {
+      "id": "vch_1791754260687_votc",
+      "organizationId": "org_test_260657",
+      "packageId": "pkg_1hr_unlimited",
+      "code": "XC-7993-8026",
+      "status": "USED",
+      "price": 500,
+      "transactionId": "tx_1791754260687_8rp9",
+      "createdAt": "2026-10-11T21:31:00.687Z",
+      "updatedAt": "2026-10-11T21:31:00.688Z",
+      "activatedAt": "2026-10-11T21:31:00.688Z",
+      "expiresAt": "2026-10-11T22:31:00.688Z",
+      "usedByMac": "AA:BB:CC:DD:EE:01",
+      "usedByIp": "192.168.88.50"
+    },
+    {
+      "id": "vch_1791754260688_0_56bx",
+      "organizationId": "org_test_260657",
+      "packageId": "pkg_1hr_unlimited",
+      "code": "TEST-6226-1827",
+      "batchId": "batch_1791754260688_60f595",
+      "status": "ACTIVE",
+      "price": 500,
+      "createdAt": "2026-10-11T21:31:00.688Z",
+      "updatedAt": "2026-10-11T21:31:00.688Z"
+    },
+    {
+      "id": "vch_1791754260688_1_xu5z",
+      "organizationId": "org_test_260657",
+      "packageId": "pkg_1hr_unlimited",
+      "code": "TEST-1281-9167",
+      "batchId": "batch_1791754260688_60f595",
+      "status": "ACTIVE",
+      "price": 500,
+      "createdAt": "2026-10-11T21:31:00.688Z",
+      "updatedAt": "2026-10-11T21:31:00.688Z"
+    },
+    {
+      "id": "vch_1791754260688_2_p9x3",
+      "organizationId": "org_test_260657",
+      "packageId": "pkg_1hr_unlimited",
+      "code": "TEST-3996-4334",
+      "batchId": "batch_1791754260688_60f595",
+      "status": "ACTIVE",
+      "price": 500,
+      "createdAt": "2026-10-11T21:31:00.688Z",
+      "updatedAt": "2026-10-11T21:31:00.688Z"
+    },
+    {
+      "id": "vch_1791754260688_3_jbpo",
+      "organizationId": "org_test_260657",
+      "packageId": "pkg_1hr_unlimited",
+      "code": "TEST-5975-2733",
+      "batchId": "batch_1791754260688_60f595",
+      "status": "ACTIVE",
+      "price": 500,
+      "createdAt": "2026-10-11T21:31:00.688Z",
+      "updatedAt": "2026-10-11T21:31:00.688Z"
+    },
+    {
+      "id": "vch_1791754260688_4_wix0",
+      "organizationId": "org_test_260657",
+      "packageId": "pkg_1hr_unlimited",
+      "code": "TEST-9454-4492",
+      "batchId": "batch_1791754260688_60f595",
+      "status": "ACTIVE",
+      "price": 500,
+      "createdAt": "2026-10-11T21:31:00.688Z",
+      "updatedAt": "2026-10-11T21:31:00.688Z"
     }
   ],
   "agents": [
@@ -3760,6 +4180,78 @@
       "updatedAt": "2026-10-10T23:00:17.852Z",
       "verifiedBy": "user_super_admin",
       "verifiedAt": "2026-10-10T23:00:17.852Z"
+    },
+    {
+      "id": "tx_1791725101710_npq8",
+      "organizationId": "org_test_101709",
+      "reference": "XC-SUB-101710-C2252A90",
+      "amount": 7000,
+      "currency": "TZS",
+      "paymentMethod": "SELCOM",
+      "paymentType": "PLATFORM_SUBSCRIPTION",
+      "status": "COMPLETED",
+      "customerPhone": "+255710000222",
+      "metadata": {},
+      "createdAt": "2026-10-11T13:25:01.710Z",
+      "updatedAt": "2026-10-11T13:25:01.742Z",
+      "providerReference": "SELCOM-TZ-9871",
+      "verifiedAt": "2026-10-11T13:25:01.742Z"
+    },
+    {
+      "id": "tx_1791725101745_bv15",
+      "organizationId": "org_test_101709",
+      "reference": "XC-MAN-101745-65C0781F",
+      "providerReference": "CASH-REC-001",
+      "amount": 1000,
+      "currency": "TZS",
+      "paymentMethod": "CASH",
+      "paymentType": "HOTSPOT_PACKAGE",
+      "status": "COMPLETED",
+      "metadata": {
+        "packageId": "pkg_1hr_unlimited",
+        "recordedBy": "user_staff_test_101709",
+        "recordedByEmail": "staff_101709@telecom.co.tz"
+      },
+      "createdAt": "2026-10-11T13:25:01.745Z",
+      "updatedAt": "2026-10-11T13:25:01.745Z",
+      "verifiedBy": "user_super_admin",
+      "verifiedAt": "2026-10-11T13:25:01.745Z"
+    },
+    {
+      "id": "tx_1791754260660_xirs",
+      "organizationId": "org_test_260657",
+      "reference": "XC-SUB-260659-B088A011",
+      "amount": 7000,
+      "currency": "TZS",
+      "paymentMethod": "SELCOM",
+      "paymentType": "PLATFORM_SUBSCRIPTION",
+      "status": "COMPLETED",
+      "customerPhone": "+255710000222",
+      "metadata": {},
+      "createdAt": "2026-10-11T21:31:00.660Z",
+      "updatedAt": "2026-10-11T21:31:00.684Z",
+      "providerReference": "SELCOM-TZ-9871",
+      "verifiedAt": "2026-10-11T21:31:00.684Z"
+    },
+    {
+      "id": "tx_1791754260687_8rp9",
+      "organizationId": "org_test_260657",
+      "reference": "XC-MAN-260687-1C3D2DED",
+      "providerReference": "CASH-REC-001",
+      "amount": 1000,
+      "currency": "TZS",
+      "paymentMethod": "CASH",
+      "paymentType": "HOTSPOT_PACKAGE",
+      "status": "COMPLETED",
+      "metadata": {
+        "packageId": "pkg_1hr_unlimited",
+        "recordedBy": "user_staff_test_260657",
+        "recordedByEmail": "staff_260657@telecom.co.tz"
+      },
+      "createdAt": "2026-10-11T21:31:00.687Z",
+      "updatedAt": "2026-10-11T21:31:00.687Z",
+      "verifiedBy": "user_super_admin",
+      "verifiedAt": "2026-10-11T21:31:00.687Z"
     }
   ],
   "audit_logs": [
@@ -6678,6 +7170,370 @@
       },
       "ipAddress": "127.0.0.1",
       "createdAt": "2026-10-10T23:00:17.856Z"
+    },
+    {
+      "id": "audit_1791725101742_xj1d1",
+      "organizationId": "org_test_101709",
+      "userId": "system_payment",
+      "userEmail": "billing@xcloud.net",
+      "action": "EXTEND_SUBSCRIPTION",
+      "resourceType": "SUBSCRIPTION",
+      "resourceId": "sub_1791725101742_6ala",
+      "details": {
+        "paymentId": "tx_1791725101710_npq8",
+        "amount": 7000,
+        "extendedDays": 30,
+        "newPeriodEnd": "2026-11-10T13:25:01.742Z"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T13:25:01.742Z"
+    },
+    {
+      "id": "audit_1791725101743_dd01e",
+      "organizationId": "org_test_101709",
+      "userId": "system_payment_webhook",
+      "userEmail": "gateway@selcom.net",
+      "action": "PROCESS_PAYMENT_WEBHOOK_SUCCESS",
+      "resourceType": "PAYMENT_TRANSACTION",
+      "resourceId": "tx_1791725101710_npq8",
+      "details": {
+        "reference": "XC-SUB-101710-C2252A90",
+        "amount": 7000,
+        "paymentType": "PLATFORM_SUBSCRIPTION"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T13:25:01.743Z"
+    },
+    {
+      "id": "audit_1791725101743_kra7y",
+      "organizationId": "org_test_101709",
+      "userId": "user_super_admin",
+      "userEmail": "mussamatembo3@gmail.com",
+      "action": "MANUAL_ADMIN_SUBSCRIPTION_EXTENSION",
+      "resourceType": "SUBSCRIPTION",
+      "resourceId": "sub_1791725101742_6ala",
+      "details": {
+        "daysAdded": 30,
+        "deviceLimit": 6,
+        "reason": "VIP Partner promotion",
+        "newEnd": "2026-12-10T13:25:01.742Z"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T13:25:01.743Z"
+    },
+    {
+      "id": "audit_1791725101744_rp1q7",
+      "organizationId": "org_limit_test_101709",
+      "userId": "user_staff_test_101709",
+      "userEmail": "staff_101709@telecom.co.tz",
+      "action": "REGISTER_ROUTER",
+      "resourceType": "ROUTER",
+      "resourceId": "rtr_1791725101743_04h9",
+      "details": {
+        "name": "Router 1",
+        "type": "MIKROTIK",
+        "rosVersion": "v7"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T13:25:01.744Z"
+    },
+    {
+      "id": "audit_1791725101745_jbwi3",
+      "organizationId": "org_limit_test_101709",
+      "userId": "user_staff_test_101709",
+      "userEmail": "staff_101709@telecom.co.tz",
+      "action": "REGISTER_ROUTER",
+      "resourceType": "ROUTER",
+      "resourceId": "rtr_1791725101744_kros",
+      "details": {
+        "name": "Router 2",
+        "type": "MIKROTIK",
+        "rosVersion": "v7"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T13:25:01.745Z"
+    },
+    {
+      "id": "audit_1791725101745_ym015",
+      "organizationId": "org_test_101709",
+      "userId": "user_staff_test_101709",
+      "userEmail": "staff_101709@telecom.co.tz",
+      "action": "RECORD_MANUAL_PAYMENT",
+      "resourceType": "PAYMENT_TRANSACTION",
+      "resourceId": "tx_1791725101745_bv15",
+      "details": {
+        "reference": "XC-MAN-101745-65C0781F",
+        "providerReference": "CASH-REC-001",
+        "amount": 1000,
+        "paymentType": "HOTSPOT_PACKAGE"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T13:25:01.745Z"
+    },
+    {
+      "id": "audit_1791725101746_0yrdu",
+      "organizationId": "org_test_101709",
+      "userId": "user_super_admin",
+      "userEmail": "mussamatembo3@gmail.com",
+      "action": "APPROVE_MANUAL_PAYMENT",
+      "resourceType": "PAYMENT_TRANSACTION",
+      "resourceId": "tx_1791725101745_bv15",
+      "details": {
+        "reference": "XC-MAN-101745-65C0781F",
+        "amount": 1000,
+        "paymentType": "HOTSPOT_PACKAGE",
+        "voucherGenerated": "XC-3581-3786"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T13:25:01.746Z"
+    },
+    {
+      "id": "audit_1791725101747_40ixp",
+      "organizationId": "org_test_101709",
+      "userId": "user_staff_test_101709",
+      "userEmail": "staff_101709@telecom.co.tz",
+      "action": "BULK_GENERATE_VOUCHERS",
+      "resourceType": "VOUCHER_BATCH",
+      "resourceId": "batch_1791725101747_48ac1e",
+      "details": {
+        "packageId": "pkg_1hr_unlimited",
+        "packageName": "1 Hour Express",
+        "count": 5,
+        "pricePerVoucher": 500
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T13:25:01.747Z"
+    },
+    {
+      "id": "audit_1791725101747_v6aqm",
+      "organizationId": "org_test_101709",
+      "userId": "user_staff_test_101709",
+      "userEmail": "staff_101709@telecom.co.tz",
+      "action": "REGISTER_ROUTER",
+      "resourceType": "ROUTER",
+      "resourceId": "rtr_1791725101747_3sbf",
+      "details": {
+        "name": "MikroTik Test Gateway",
+        "type": "MIKROTIK",
+        "rosVersion": "v7"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T13:25:01.747Z"
+    },
+    {
+      "id": "audit_1791725101749_we5cc",
+      "organizationId": "org_test_101709",
+      "userId": "user_staff_test_101709",
+      "userEmail": "staff_101709@telecom.co.tz",
+      "action": "UPDATE_OMADA_CONTROLLER_CONFIG",
+      "resourceType": "OMADA_CONTROLLER",
+      "resourceId": "omd_1791725101749_0tvo",
+      "details": {
+        "controllerUrl": "https://192.168.1.200:8043",
+        "siteId": "site_default_tz"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T13:25:01.749Z"
+    },
+    {
+      "id": "audit_1791750708796_yfnhg",
+      "organizationId": "org_mussa_telecom",
+      "userId": "user_super_admin",
+      "userEmail": "mussamatembo3@gmail.com",
+      "action": "GOOGLE_AUTH_LOGIN",
+      "resourceType": "USER",
+      "resourceId": "user_super_admin",
+      "details": {},
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T20:31:48.796Z"
+    },
+    {
+      "id": "audit_1791752712281_y7r5m",
+      "organizationId": "org_mussa_telecom",
+      "userId": "user_super_admin",
+      "userEmail": "mussamatembo3@gmail.com",
+      "action": "USER_LOGIN",
+      "resourceType": "USER",
+      "resourceId": "user_super_admin",
+      "details": {},
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T21:05:12.281Z"
+    },
+    {
+      "id": "audit_1791754260685_9trln",
+      "organizationId": "org_test_260657",
+      "userId": "system_payment",
+      "userEmail": "billing@xcloud.net",
+      "action": "EXTEND_SUBSCRIPTION",
+      "resourceType": "SUBSCRIPTION",
+      "resourceId": "sub_1791754260685_33kd",
+      "details": {
+        "paymentId": "tx_1791754260660_xirs",
+        "amount": 7000,
+        "extendedDays": 30,
+        "newPeriodEnd": "2026-11-10T21:31:00.685Z"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T21:31:00.685Z"
+    },
+    {
+      "id": "audit_1791754260685_1n04p",
+      "organizationId": "org_test_260657",
+      "userId": "system_payment_webhook",
+      "userEmail": "gateway@selcom.net",
+      "action": "PROCESS_PAYMENT_WEBHOOK_SUCCESS",
+      "resourceType": "PAYMENT_TRANSACTION",
+      "resourceId": "tx_1791754260660_xirs",
+      "details": {
+        "reference": "XC-SUB-260659-B088A011",
+        "amount": 7000,
+        "paymentType": "PLATFORM_SUBSCRIPTION"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T21:31:00.685Z"
+    },
+    {
+      "id": "audit_1791754260685_q6zxl",
+      "organizationId": "org_test_260657",
+      "userId": "user_super_admin",
+      "userEmail": "mussamatembo3@gmail.com",
+      "action": "MANUAL_ADMIN_SUBSCRIPTION_EXTENSION",
+      "resourceType": "SUBSCRIPTION",
+      "resourceId": "sub_1791754260685_33kd",
+      "details": {
+        "daysAdded": 30,
+        "deviceLimit": 6,
+        "reason": "VIP Partner promotion",
+        "newEnd": "2026-12-10T21:31:00.685Z"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T21:31:00.685Z"
+    },
+    {
+      "id": "audit_1791754260686_efasq",
+      "organizationId": "org_limit_test_260657",
+      "userId": "user_staff_test_260657",
+      "userEmail": "staff_260657@telecom.co.tz",
+      "action": "REGISTER_ROUTER",
+      "resourceType": "ROUTER",
+      "resourceId": "rtr_1791754260686_gafa",
+      "details": {
+        "name": "Router 1",
+        "type": "MIKROTIK",
+        "rosVersion": "v7"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T21:31:00.686Z"
+    },
+    {
+      "id": "audit_1791754260686_4ldvj",
+      "organizationId": "org_limit_test_260657",
+      "userId": "user_staff_test_260657",
+      "userEmail": "staff_260657@telecom.co.tz",
+      "action": "REGISTER_ROUTER",
+      "resourceType": "ROUTER",
+      "resourceId": "rtr_1791754260686_mpsm",
+      "details": {
+        "name": "Router 2",
+        "type": "MIKROTIK",
+        "rosVersion": "v7"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T21:31:00.687Z"
+    },
+    {
+      "id": "audit_1791754260687_xilzb",
+      "organizationId": "org_test_260657",
+      "userId": "user_staff_test_260657",
+      "userEmail": "staff_260657@telecom.co.tz",
+      "action": "RECORD_MANUAL_PAYMENT",
+      "resourceType": "PAYMENT_TRANSACTION",
+      "resourceId": "tx_1791754260687_8rp9",
+      "details": {
+        "reference": "XC-MAN-260687-1C3D2DED",
+        "providerReference": "CASH-REC-001",
+        "amount": 1000,
+        "paymentType": "HOTSPOT_PACKAGE"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T21:31:00.687Z"
+    },
+    {
+      "id": "audit_1791754260687_griv9",
+      "organizationId": "org_test_260657",
+      "userId": "user_super_admin",
+      "userEmail": "mussamatembo3@gmail.com",
+      "action": "APPROVE_MANUAL_PAYMENT",
+      "resourceType": "PAYMENT_TRANSACTION",
+      "resourceId": "tx_1791754260687_8rp9",
+      "details": {
+        "reference": "XC-MAN-260687-1C3D2DED",
+        "amount": 1000,
+        "paymentType": "HOTSPOT_PACKAGE",
+        "voucherGenerated": "XC-7993-8026"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T21:31:00.687Z"
+    },
+    {
+      "id": "audit_1791754260688_c57b8",
+      "organizationId": "org_test_260657",
+      "userId": "user_staff_test_260657",
+      "userEmail": "staff_260657@telecom.co.tz",
+      "action": "BULK_GENERATE_VOUCHERS",
+      "resourceType": "VOUCHER_BATCH",
+      "resourceId": "batch_1791754260688_60f595",
+      "details": {
+        "packageId": "pkg_1hr_unlimited",
+        "packageName": "1 Hour Express",
+        "count": 5,
+        "pricePerVoucher": 500
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T21:31:00.688Z"
+    },
+    {
+      "id": "audit_1791754260688_snrq6",
+      "organizationId": "org_test_260657",
+      "userId": "user_staff_test_260657",
+      "userEmail": "staff_260657@telecom.co.tz",
+      "action": "REGISTER_ROUTER",
+      "resourceType": "ROUTER",
+      "resourceId": "rtr_1791754260688_bayo",
+      "details": {
+        "name": "MikroTik Test Gateway",
+        "type": "MIKROTIK",
+        "rosVersion": "v7"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T21:31:00.688Z"
+    },
+    {
+      "id": "audit_1791754260690_f9mwp",
+      "organizationId": "org_test_260657",
+      "userId": "user_staff_test_260657",
+      "userEmail": "staff_260657@telecom.co.tz",
+      "action": "UPDATE_OMADA_CONTROLLER_CONFIG",
+      "resourceType": "OMADA_CONTROLLER",
+      "resourceId": "omd_1791754260690_3u8z",
+      "details": {
+        "controllerUrl": "https://192.168.1.200:8043",
+        "siteId": "site_default_tz"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-11T21:31:00.690Z"
+    },
+    {
+      "id": "audit_1791888953580_a96nd",
+      "organizationId": "org_mussa_telecom",
+      "userId": "user_super_admin",
+      "userEmail": "mussamatembo3@gmail.com",
+      "action": "GOOGLE_AUTH_LOGIN",
+      "resourceType": "USER",
+      "resourceId": "user_super_admin",
+      "details": {},
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-13T10:55:53.580Z"
     }
   ],
   "hotspot_sessions": [
@@ -6935,6 +7791,36 @@
       "bytesOut": 0,
       "sessionTimeSeconds": 0,
       "isActive": true
+    },
+    {
+      "id": "sess_1791725101746_zqje",
+      "organizationId": "org_test_101709",
+      "routerId": "router_default",
+      "voucherCode": "XC-3581-3786",
+      "username": "XC-3581-3786",
+      "ipAddress": "192.168.88.50",
+      "macAddress": "AA:BB:CC:DD:EE:01",
+      "startedAt": "2026-10-11T13:25:01.746Z",
+      "lastAccountingAt": "2026-10-11T13:25:01.746Z",
+      "bytesIn": 0,
+      "bytesOut": 0,
+      "sessionTimeSeconds": 0,
+      "isActive": true
+    },
+    {
+      "id": "sess_1791754260688_3hy4",
+      "organizationId": "org_test_260657",
+      "routerId": "router_default",
+      "voucherCode": "XC-7993-8026",
+      "username": "XC-7993-8026",
+      "ipAddress": "192.168.88.50",
+      "macAddress": "AA:BB:CC:DD:EE:01",
+      "startedAt": "2026-10-11T21:31:00.688Z",
+      "lastAccountingAt": "2026-10-11T21:31:00.688Z",
+      "bytesIn": 0,
+      "bytesOut": 0,
+      "sessionTimeSeconds": 0,
+      "isActive": true
     }
   ],
   "omada_controllers": [
@@ -7132,6 +8018,28 @@
       "status": "DISCONNECTED",
       "createdAt": "2026-10-10T23:00:17.856Z",
       "updatedAt": "2026-10-10T23:00:17.856Z"
+    },
+    {
+      "id": "omd_1791725101749_0tvo",
+      "organizationId": "org_test_101709",
+      "controllerUrl": "https://192.168.1.200:8043",
+      "siteId": "site_default_tz",
+      "operatorUsername": "admin_omada",
+      "operatorPasswordEncrypted": "SecurePass123",
+      "status": "DISCONNECTED",
+      "createdAt": "2026-10-11T13:25:01.749Z",
+      "updatedAt": "2026-10-11T13:25:01.749Z"
+    },
+    {
+      "id": "omd_1791754260690_3u8z",
+      "organizationId": "org_test_260657",
+      "controllerUrl": "https://192.168.1.200:8043",
+      "siteId": "site_default_tz",
+      "operatorUsername": "admin_omada",
+      "operatorPasswordEncrypted": "SecurePass123",
+      "status": "DISCONNECTED",
+      "createdAt": "2026-10-11T21:31:00.690Z",
+      "updatedAt": "2026-10-11T21:31:00.690Z"
     }
   ],
   "activity_events": [
@@ -8651,6 +9559,253 @@
       "message": "Configured Omada Controller for site site_default_tz (https://192.168.1.200:8043)",
       "correlationId": "req-1791673217856-56e49d",
       "createdAt": "2026-10-10T23:00:17.856Z"
+    },
+    {
+      "id": "act_1791725101744_81uht",
+      "organizationId": "org_limit_test_101709",
+      "organizationName": "Limited Devices Org",
+      "userId": "user_staff_test_101709",
+      "userEmail": "staff_101709@telecom.co.tz",
+      "deviceId": "rtr_1791725101743_04h9",
+      "deviceName": "Router 1",
+      "deviceType": "MIKROTIK",
+      "action": "ROUTER_REGISTERED",
+      "category": "MANAGEMENT",
+      "result": "SUCCESS",
+      "sourceIp": "127.0.0.1",
+      "message": "Router Router 1 registered under organization (ROS v7)",
+      "correlationId": "req-1791725101744-f38047",
+      "createdAt": "2026-10-11T13:25:01.744Z"
+    },
+    {
+      "id": "act_1791725101744_90rhq",
+      "organizationId": "org_limit_test_101709",
+      "organizationName": "Limited Devices Org",
+      "userId": "user_staff_test_101709",
+      "userEmail": "staff_101709@telecom.co.tz",
+      "deviceId": "rtr_1791725101744_kros",
+      "deviceName": "Router 2",
+      "deviceType": "MIKROTIK",
+      "action": "ROUTER_REGISTERED",
+      "category": "MANAGEMENT",
+      "result": "SUCCESS",
+      "sourceIp": "127.0.0.1",
+      "message": "Router Router 2 registered under organization (ROS v7)",
+      "correlationId": "req-1791725101744-4d89f8",
+      "createdAt": "2026-10-11T13:25:01.745Z"
+    },
+    {
+      "id": "act_1791725101745_vwv45",
+      "organizationId": "org_limit_test_101709",
+      "organizationName": "Limited Devices Org",
+      "userId": "user_staff_test_101709",
+      "userEmail": "staff_101709@telecom.co.tz",
+      "deviceType": "SYSTEM",
+      "action": "ROUTER_REGISTRATION_REJECTED",
+      "category": "MANAGEMENT",
+      "result": "DENIED",
+      "sourceIp": "127.0.0.1",
+      "message": "Device registration denied: Device limit reached (2/2 routers registered). Upgrade your plan or contact support to increase limit.",
+      "correlationId": "req-1791725101745-49f9db",
+      "createdAt": "2026-10-11T13:25:01.745Z"
+    },
+    {
+      "id": "act_1791725101747_erpi3",
+      "organizationId": "org_test_101709",
+      "organizationName": "Kilimanjaro Wireless Networks",
+      "userId": "user_staff_test_101709",
+      "userEmail": "staff_101709@telecom.co.tz",
+      "deviceId": "rtr_1791725101747_3sbf",
+      "deviceName": "MikroTik Test Gateway",
+      "deviceType": "MIKROTIK",
+      "action": "ROUTER_REGISTERED",
+      "category": "MANAGEMENT",
+      "result": "SUCCESS",
+      "sourceIp": "127.0.0.1",
+      "message": "Router MikroTik Test Gateway registered under organization (ROS v7)",
+      "correlationId": "req-1791725101747-fd7b43",
+      "createdAt": "2026-10-11T13:25:01.747Z"
+    },
+    {
+      "id": "act_1791725101748_9ui06",
+      "organizationId": "org_test_101709",
+      "organizationName": "Kilimanjaro Wireless Networks",
+      "deviceId": "rtr_1791725101747_3sbf",
+      "deviceName": "MikroTik Test Gateway",
+      "deviceType": "MIKROTIK",
+      "action": "INSTALLATION_TOKEN_GENERATED",
+      "category": "INSTALLATION",
+      "result": "SUCCESS",
+      "sourceIp": "127.0.0.1",
+      "message": "Generated short-lived bootstrap token for router MikroTik Test Gateway",
+      "correlationId": "req-1791725101748-e0c0b3",
+      "createdAt": "2026-10-11T13:25:01.748Z"
+    },
+    {
+      "id": "act_1791725101749_4tjqz",
+      "organizationId": "org_test_101709",
+      "organizationName": "Kilimanjaro Wireless Networks",
+      "userId": "user_staff_test_101709",
+      "userEmail": "staff_101709@telecom.co.tz",
+      "deviceId": "omd_1791725101749_0tvo",
+      "deviceName": "Omada (site_default_tz)",
+      "deviceType": "OMADA",
+      "action": "OMADA_CONFIG_SAVED",
+      "category": "CONFIGURATION",
+      "result": "SUCCESS",
+      "sourceIp": "127.0.0.1",
+      "message": "Configured Omada Controller for site site_default_tz (https://192.168.1.200:8043)",
+      "correlationId": "req-1791725101749-1efbfd",
+      "createdAt": "2026-10-11T13:25:01.749Z"
+    },
+    {
+      "id": "act_1791750708796_j50d8",
+      "organizationId": "org_mussa_telecom",
+      "organizationName": "Mussa Telecom & Hotspot Services",
+      "userId": "user_super_admin",
+      "userName": "Mussa Matembo (Super Admin)",
+      "userEmail": "mussamatembo3@gmail.com",
+      "userRole": "SUPER_ADMIN",
+      "deviceType": "SYSTEM",
+      "action": "SPECIAL_ADMIN_GOOGLE_LOGIN",
+      "category": "AUTHENTICATION",
+      "result": "SUCCESS",
+      "sourceIp": "127.0.0.1",
+      "message": "Special Admin authenticated via Google (mussamatembo3@gmail.com) - Global Monitoring Enabled",
+      "correlationId": "req-1791750708796-c1d34e",
+      "createdAt": "2026-10-11T20:31:48.796Z"
+    },
+    {
+      "id": "act_1791752712281_mmhrc",
+      "organizationId": "org_mussa_telecom",
+      "organizationName": "Mussa Telecom & Hotspot Services",
+      "userId": "user_super_admin",
+      "userName": "Mussa Matembo (Super Admin)",
+      "userEmail": "mussamatembo3@gmail.com",
+      "userRole": "SUPER_ADMIN",
+      "deviceType": "SYSTEM",
+      "action": "USER_LOGIN",
+      "category": "AUTHENTICATION",
+      "result": "SUCCESS",
+      "sourceIp": "127.0.0.1",
+      "message": "User mussamatembo3@gmail.com logged in successfully",
+      "correlationId": "req-1791752712281-b5e9de",
+      "createdAt": "2026-10-11T21:05:12.281Z"
+    },
+    {
+      "id": "act_1791754260686_5xeeb",
+      "organizationId": "org_limit_test_260657",
+      "organizationName": "Limited Devices Org",
+      "userId": "user_staff_test_260657",
+      "userEmail": "staff_260657@telecom.co.tz",
+      "deviceId": "rtr_1791754260686_gafa",
+      "deviceName": "Router 1",
+      "deviceType": "MIKROTIK",
+      "action": "ROUTER_REGISTERED",
+      "category": "MANAGEMENT",
+      "result": "SUCCESS",
+      "sourceIp": "127.0.0.1",
+      "message": "Router Router 1 registered under organization (ROS v7)",
+      "correlationId": "req-1791754260686-38dd3d",
+      "createdAt": "2026-10-11T21:31:00.686Z"
+    },
+    {
+      "id": "act_1791754260686_f8rt3",
+      "organizationId": "org_limit_test_260657",
+      "organizationName": "Limited Devices Org",
+      "userId": "user_staff_test_260657",
+      "userEmail": "staff_260657@telecom.co.tz",
+      "deviceId": "rtr_1791754260686_mpsm",
+      "deviceName": "Router 2",
+      "deviceType": "MIKROTIK",
+      "action": "ROUTER_REGISTERED",
+      "category": "MANAGEMENT",
+      "result": "SUCCESS",
+      "sourceIp": "127.0.0.1",
+      "message": "Router Router 2 registered under organization (ROS v7)",
+      "correlationId": "req-1791754260686-8838b7",
+      "createdAt": "2026-10-11T21:31:00.686Z"
+    },
+    {
+      "id": "act_1791754260687_17xx3",
+      "organizationId": "org_limit_test_260657",
+      "organizationName": "Limited Devices Org",
+      "userId": "user_staff_test_260657",
+      "userEmail": "staff_260657@telecom.co.tz",
+      "deviceType": "SYSTEM",
+      "action": "ROUTER_REGISTRATION_REJECTED",
+      "category": "MANAGEMENT",
+      "result": "DENIED",
+      "sourceIp": "127.0.0.1",
+      "message": "Device registration denied: Device limit reached (2/2 routers registered). Upgrade your plan or contact support to increase limit.",
+      "correlationId": "req-1791754260687-bd4b38",
+      "createdAt": "2026-10-11T21:31:00.687Z"
+    },
+    {
+      "id": "act_1791754260688_m8uj5",
+      "organizationId": "org_test_260657",
+      "organizationName": "Kilimanjaro Wireless Networks",
+      "userId": "user_staff_test_260657",
+      "userEmail": "staff_260657@telecom.co.tz",
+      "deviceId": "rtr_1791754260688_bayo",
+      "deviceName": "MikroTik Test Gateway",
+      "deviceType": "MIKROTIK",
+      "action": "ROUTER_REGISTERED",
+      "category": "MANAGEMENT",
+      "result": "SUCCESS",
+      "sourceIp": "127.0.0.1",
+      "message": "Router MikroTik Test Gateway registered under organization (ROS v7)",
+      "correlationId": "req-1791754260688-3baf2c",
+      "createdAt": "2026-10-11T21:31:00.688Z"
+    },
+    {
+      "id": "act_1791754260689_ysr7b",
+      "organizationId": "org_test_260657",
+      "organizationName": "Kilimanjaro Wireless Networks",
+      "deviceId": "rtr_1791754260688_bayo",
+      "deviceName": "MikroTik Test Gateway",
+      "deviceType": "MIKROTIK",
+      "action": "INSTALLATION_TOKEN_GENERATED",
+      "category": "INSTALLATION",
+      "result": "SUCCESS",
+      "sourceIp": "127.0.0.1",
+      "message": "Generated short-lived bootstrap token for router MikroTik Test Gateway",
+      "correlationId": "req-1791754260689-d6bffd",
+      "createdAt": "2026-10-11T21:31:00.689Z"
+    },
+    {
+      "id": "act_1791754260690_2ycjp",
+      "organizationId": "org_test_260657",
+      "organizationName": "Kilimanjaro Wireless Networks",
+      "userId": "user_staff_test_260657",
+      "userEmail": "staff_260657@telecom.co.tz",
+      "deviceId": "omd_1791754260690_3u8z",
+      "deviceName": "Omada (site_default_tz)",
+      "deviceType": "OMADA",
+      "action": "OMADA_CONFIG_SAVED",
+      "category": "CONFIGURATION",
+      "result": "SUCCESS",
+      "sourceIp": "127.0.0.1",
+      "message": "Configured Omada Controller for site site_default_tz (https://192.168.1.200:8043)",
+      "correlationId": "req-1791754260690-df2968",
+      "createdAt": "2026-10-11T21:31:00.690Z"
+    },
+    {
+      "id": "act_1791888953579_z9986",
+      "organizationId": "org_mussa_telecom",
+      "organizationName": "Mussa Telecom & Hotspot Services",
+      "userId": "user_super_admin",
+      "userName": "Mussa Matembo (Super Admin)",
+      "userEmail": "mussamatembo3@gmail.com",
+      "userRole": "SUPER_ADMIN",
+      "deviceType": "SYSTEM",
+      "action": "SPECIAL_ADMIN_GOOGLE_LOGIN",
+      "category": "AUTHENTICATION",
+      "result": "SUCCESS",
+      "sourceIp": "127.0.0.1",
+      "message": "Special Admin authenticated via Google (mussamatembo3@gmail.com) - Global Monitoring Enabled",
+      "correlationId": "req-1791888953579-3b7c61",
+      "createdAt": "2026-10-13T10:55:53.580Z"
     }
   ],
   "router_heartbeats": [
@@ -8821,9 +9976,53 @@
       "cpuLoad": 0,
       "freeMemory": 0,
       "createdAt": "2026-10-10T23:00:17.855Z"
+    },
+    {
+      "id": "hb_1791725101749_p698",
+      "routerId": "rtr_1791725101747_3sbf",
+      "organizationId": "org_test_101709",
+      "identity": "RB750Gr3-MikroTik",
+      "rosVersion": "7.15.2",
+      "activeHotspotUsers": 14,
+      "uptime": "14d 02:18:41",
+      "cpuLoad": 0,
+      "freeMemory": 0,
+      "createdAt": "2026-10-11T13:25:01.749Z"
+    },
+    {
+      "id": "hb_1791754260690_c7g6",
+      "routerId": "rtr_1791754260688_bayo",
+      "organizationId": "org_test_260657",
+      "identity": "RB750Gr3-MikroTik",
+      "rosVersion": "7.15.2",
+      "activeHotspotUsers": 14,
+      "uptime": "14d 02:18:41",
+      "cpuLoad": 0,
+      "freeMemory": 0,
+      "createdAt": "2026-10-11T21:31:00.690Z"
     }
   ],
   "invoices": [],
   "omada_devices": [],
-  "device_status_history": []
+  "device_status_history": [],
+  "captive_portal_configs": [
+    {
+      "id": "cpc_1791889026999_1w6z",
+      "organizationId": "org_default_01",
+      "ssidName": "XCLOUD-Free-WiFi",
+      "portalTitle": "Karibu kwenye Mtandao wa Kasi",
+      "portalSubtitle": "Unganisha kifaa chako kwa kuweka vocha au kulipia mtandaoni",
+      "themeColor": "#4f46e5",
+      "supportPhone": "+255 754 000 000",
+      "supportEmail": "support@xcloud.net",
+      "termsOfService": "Kwa kutumia mtandao huu, unakubali masharti na vigezo vya huduma ya XCLOUD.NET.",
+      "enableVoucherLogin": true,
+      "enableMobileMoneyBuy": true,
+      "enableFreeTrial": true,
+      "freeTrialMinutes": 15,
+      "enableMemberLogin": true,
+      "routerDns": "wifi.xcloudtz.net",
+      "updatedAt": "2026-10-13T10:57:06.999Z"
+    }
+  ]
 }

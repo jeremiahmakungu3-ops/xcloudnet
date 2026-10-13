@@ -24,6 +24,7 @@ import omadaRoutes from './src/server/routes/omadaRoutes.ts';
 import reportRoutes from './src/server/routes/reportRoutes.ts';
 import adminRoutes from './src/server/routes/adminRoutes.ts';
 import userRoutes from './src/server/routes/userRoutes.ts';
+import captivePortalRoutes from './src/server/routes/captivePortalRoutes.ts';
 
 dotenv.config();
 
@@ -76,6 +77,12 @@ async function startServer() {
   app.use('/api/v1/reports', reportRoutes);
   app.use('/api/v1/admin', adminRoutes);
   app.use('/api/v1/users', userRoutes);
+  app.use('/api/v1/captive-portal', captivePortalRoutes);
+
+  // Direct Public Captive Portal URL for Wi-Fi Clients
+  app.get('/portal', (req: Request, res: Response) => {
+    res.redirect('/api/v1/captive-portal/live');
+  });
 
   const server = http.createServer(app);
 

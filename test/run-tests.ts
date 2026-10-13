@@ -423,6 +423,51 @@ async function runTestSuite() {
   const stdUser = db.findOne<any>('users', (u) => u.email === standardEmail);
   assert(stdUser?.role === 'ORG_ADMIN', 'Standard user cannot auto-escalate to SUPER_ADMIN');
 
+  // SUITE 15: Captive Portal Template Generation & RouterOS v7 Files
+  console.log('\n--- SUITE 15: Captive Portal Template Generation & RouterOS v7 Export ---');
+  const { CaptivePortalTemplateService } = await import('../src/server/services/captivePortalTemplate.ts');
+  const mockConfig: any = {
+    id: 'cpc_test',
+    organizationId: 'org_test_01',
+    ssidName: 'XCLOUD-Serengeti-WiFi',
+    portalTitle: 'Karibu Mtandaoni',
+    portalSubtitle: 'Weka vocha au lipia mtandaoni',
+    themeColor: '#4f46e5',
+    supportPhone: '+255754111222',
+    supportEmail: 'support@xcloud.net',
+    termsOfService: 'TOS',
+    enableVoucherLogin: true,
+    enableMobileMoneyBuy: true,
+    enableFreeTrial: true,
+    freeTrialMinutes: 15,
+    enableMemberLogin: true,
+    routerDns: 'wifi.xcloudtz.net',
+    updatedAt: new Date().toISOString(),
+  };
+
+  const loginHtml = CaptivePortalTemplateService.generateLoginHtml({
+    config: mockConfig,
+    packages: [],
+    apiBaseUrl: 'http://localhost:3000',
+  });
+  assert(loginHtml.includes('$(link-login-only)'), 'login.html contains RouterOS $(link-login-only)');
+  assert(loginHtml.includes('XCLOUD-Serengeti-WiFi'), 'login.html reflects configured SSID name');
+  assert(loginHtml.includes('md5.js'), 'login.html references md5.js for CHAP authentication');
+
+  const statusHtml = CaptivePortalTemplateService.generateStatusHtml({
+    config: mockConfig,
+    packages: [],
+    apiBaseUrl: 'http://localhost:3000',
+  });
+  assert(statusHtml.includes('$(uptime)'), 'status.html contains $(uptime) counter');
+  assert(statusHtml.includes('$(link-logout)'), 'status.html contains $(link-logout) form');
+
+  const md5Js = CaptivePortalTemplateService.getMd5Js();
+  assert(md5Js.includes('function hexMD5'), 'md5.js exports hexMD5 for MikroTik CHAP hashing');
+
+  const errorsTxt = CaptivePortalTemplateService.getErrorsTxt();
+  assert(errorsTxt.includes('already-logged-in'), 'errors.txt includes RouterOS error mappings');
+
   console.log('\n=================================================================');
   console.log(`  TEST RESULTS: ${passedCount} PASSED, ${failedCount} FAILED`);
   console.log('=================================================================\n');
